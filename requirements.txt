@@ -1,0 +1,42 @@
+# Core
+numpy==1.26.4
+scipy==1.13.1
+scikit-learn==1.5.2
+matplotlib==3.9.2
+pillow==10.4.0
+opencv-python==4.10.0.84
+imageio==2.36.0
+imageio-ffmpeg==0.5.1
+tqdm==4.66.5
+pyyaml==6.0.2
+einops==0.8.0
+
+# Torch (cu121 wheels). Install via:
+#   pip install torch==2.4.1 torchvision==0.19.1 --index-url https://download.pytorch.org/whl/cu121
+# Listed here for reference; pin separately if installing CPU wheels.
+# torch==2.4.1
+# torchvision==0.19.1
+
+# Foundation models / VLMs (lazy-loaded; only what is actually called gets fetched)
+transformers==4.49.0
+accelerate==1.0.1
+bitsandbytes==0.44.1   # optional 4-bit quant for larger VLMs
+sentencepiece==0.2.0
+protobuf==5.28.3
+qwen-vl-utils==0.0.8   # for Qwen2.5-VL image preprocessing
+
+# UMD .mat label parsing
+h5py==3.12.1
+
+# Segmentation refinement
+# SAM 2 must be installed from source per upstream README:
+#   pip install "git+https://github.com/facebookresearch/sam2.git"
+# Plus weights downloaded into outputs/checkpoints/sam2/
+
+# RL + sim
+gymnasium==0.29.1
+panda-gym==3.0.7
+stable-baselines3==2.3.2
+sb3-contrib==2.3.0
+huggingface_sb3==3.0
+pybullet==3.2.6

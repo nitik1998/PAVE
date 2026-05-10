@@ -1,0 +1,51 @@
+# Locked affordance taxonomy for the project.
+# UMD Part Affordance Dataset native ids vs. our reduced 5-class set
+# from the proposal slide.
+#
+# Class id 0 is reserved for background.
+
+version: 1
+
+classes:
+  - id: 0
+    name: background
+    umd_ids: [0]
+    prompts: ["background", "the table", "empty surface"]
+  - id: 1
+    name: grasp
+    umd_ids: [1, 7]      # grasp + w-grasp folded together
+    prompts:
+      - "the part of the object you would grasp"
+      - "graspable region"
+      - "handle"
+  - id: 2
+    name: cut
+    umd_ids: [2]
+    prompts:
+      - "the cutting edge of the object"
+      - "blade"
+      - "sharp edge"
+  - id: 3
+    name: scoop
+    umd_ids: [3]
+    prompts:
+      - "the scooping part of the object"
+      - "scoop"
+      - "the concave surface used to lift loose material"
+  - id: 4
+    name: contain
+    umd_ids: [4]
+    prompts:
+      - "the part of the object that can hold liquid or contents"
+      - "container interior"
+      - "the bowl of the object"
+  - id: 5
+    name: support
+    umd_ids: [6]
+    prompts:
+      - "the supporting flat surface of the object"
+      - "platform"
+      - "the surface on which something can rest"
+
+# UMD ids 5 (pound) is intentionally excluded for parity with the proposal slide.
+# Add it back here if a later experiment needs it.

@@ -1,0 +1,170 @@
+[
+  {
+    "id": "bowl_10_00000400",
+    "rgb": "data/umd/tools/bowl_10/bowl_10_00000400_rgb.jpg",
+    "label": "data/umd/tools/bowl_10/bowl_10_00000400_label.mat",
+    "category": "bowl"
+  },
+  {
+    "id": "shears_01_00000150",
+    "rgb": "data/umd/tools/shears_01/shears_01_00000150_rgb.jpg",
+    "label": "data/umd/tools/shears_01/shears_01_00000150_label.mat",
+    "category": "shears"
+  },
+  {
+    "id": "trowel_05_00000160",
+    "rgb": "data/umd/tools/trowel_05/trowel_05_00000160_rgb.jpg",
+    "label": "data/umd/tools/trowel_05/trowel_05_00000160_label.mat",
+    "category": "trowel"
+  },
+  {
+    "id": "trowel_04_00000054",
+    "rgb": "data/umd/tools/trowel_04/trowel_04_00000054_rgb.jpg",
+    "label": "data/umd/tools/trowel_04/trowel_04_00000054_label.mat",
+    "category": "trowel"
+  },
+  {
+    "id": "tenderizer_02_00000292",
+    "rgb": "data/umd/tools/tenderizer_02/tenderizer_02_00000292_rgb.jpg",
+    "label": "data/umd/tools/tenderizer_02/tenderizer_02_00000292_label.mat",
+    "category": "tenderizer"
+  },
+  {
+    "id": "tenderizer_02_00000198",
+    "rgb": "data/umd/tools/tenderizer_02/tenderizer_02_00000198_rgb.jpg",
+    "label": "data/umd/tools/tenderizer_02/tenderizer_02_00000198_label.mat",
+    "category": "tenderizer"
+  },
+  {
+    "id": "ladle_03_00000178",
+    "rgb": "data/umd/tools/ladle_03/ladle_03_00000178_rgb.jpg",
+    "label": "data/umd/tools/ladle_03/ladle_03_00000178_label.mat",
+    "category": "ladle"
+  },
+  {
+    "id": "cup_04_00000067",
+    "rgb": "data/umd/tools/cup_04/cup_04_00000067_rgb.jpg",
+    "label": "data/umd/tools/cup_04/cup_04_00000067_label.mat",
+    "category": "cup"
+  },
+  {
+    "id": "saw_01_00000252",
+    "rgb": "data/umd/tools/saw_01/saw_01_00000252_rgb.jpg",
+    "label": "data/umd/tools/saw_01/saw_01_00000252_label.mat",
+    "category": "saw"
+  },
+  {
+    "id": "scissors_06_00000007",
+    "rgb": "data/umd/tools/scissors_06/scissors_06_00000007_rgb.jpg",
+    "label": "data/umd/tools/scissors_06/scissors_06_00000007_label.mat",
+    "category": "scissors"
+  },
+  {
+    "id": "tenderizer_01_00000114",
+    "rgb": "data/umd/tools/tenderizer_01/tenderizer_01_00000114_rgb.jpg",
+    "label": "data/umd/tools/tenderizer_01/tenderizer_01_00000114_label.mat",
+    "category": "tenderizer"
+  },
+  {
+    "id": "spoon_07_00000055",
+    "rgb": "data/umd/tools/spoon_07/spoon_07_00000055_rgb.jpg",
+    "label": "data/umd/tools/spoon_07/spoon_07_00000055_label.mat",
+    "category": "spoon"
+  },
+  {
+    "id": "mallet_03_00000086",
+    "rgb": "data/umd/tools/mallet_03/mallet_03_00000086_rgb.jpg",
+    "label": "data/umd/tools/mallet_03/mallet_03_00000086_label.mat",
+    "category": "mallet"
+  },
+  {
+    "id": "shears_01_00000180",
+    "rgb": "data/umd/tools/shears_01/shears_01_00000180_rgb.jpg",
+    "label": "data/umd/tools/shears_01/shears_01_00000180_label.mat",
+    "category": "shears"
+  },
+  {
+    "id": "shovel_01_00000076",
+    "rgb": "data/umd/tools/shovel_01/shovel_01_00000076_rgb.jpg",
+    "label": "data/umd/tools/shovel_01/shovel_01_00000076_label.mat",
+    "category": "shovel"
+  },
+  {
+    "id": "pot_01_00000042",
+    "rgb": "data/umd/tools/pot_01/pot_01_00000042_rgb.jpg",
+    "label": "data/umd/tools/pot_01/pot_01_00000042_label.mat",
+    "category": "pot"
+  },
+  {
+    "id": "mallet_02_00000008",
+    "rgb": "data/umd/tools/mallet_02/mallet_02_00000008_rgb.jpg",
+    "label": "data/umd/tools/mallet_02/mallet_02_00000008_label.mat",
+    "category": "mallet"
+  },
+  {
+    "id": "mallet_02_00000028",
+    "rgb": "data/umd/tools/mallet_02/mallet_02_00000028_rgb.jpg",
+    "label": "data/umd/tools/mallet_02/mallet_02_00000028_label.mat",
+    "category": "mallet"
+  },
+  {
+    "id": "shovel_02_00000108",
+    "rgb": "data/umd/tools/shovel_02/shovel_02_00000108_rgb.jpg",
+    "label": "data/umd/tools/shovel_02/shovel_02_00000108_label.mat",
+    "category": "shovel"
+  },
+  {
+    "id": "cup_03_00000213",
+    "rgb": "data/umd/tools/cup_03/cup_03_00000213_rgb.jpg",
+    "label": "data/umd/tools/cup_03/cup_03_00000213_label.mat",
+    "category": "cup"
+  },
+  {
+    "id": "bowl_02_00000099",
+    "rgb": "data/umd/tools/bowl_02/bowl_02_00000099_rgb.jpg",
+    "label": "data/umd/tools/bowl_02/bowl_02_00000099_label.mat",
+    "category": "bowl"
+  },
+  {
+    "id": "bowl_09_00000276",
+    "rgb": "data/umd/tools/bowl_09/bowl_09_00000276_rgb.jpg",
+    "label": "data/umd/tools/bowl_09/bowl_09_00000276_label.mat",
+    "category": "bowl"
+  },
+  {
+    "id": "scissors_06_00000220",
+    "rgb": "data/umd/tools/scissors_06/scissors_06_00000220_rgb.jpg",
+    "label": "data/umd/tools/scissors_06/scissors_06_00000220_label.mat",
+    "category": "scissors"
+  },
+  {
+    "id": "scoop_01_00000201",
+    "rgb": "data/umd/tools/scoop_01/scoop_01_00000201_rgb.jpg",
+    "label": "data/umd/tools/scoop_01/scoop_01_00000201_label.mat",
+    "category": "scoop"
+  },
+  {
+    "id": "shovel_02_00000169",
+    "rgb": "data/umd/tools/shovel_02/shovel_02_00000169_rgb.jpg",
+    "label": "data/umd/tools/shovel_02/shovel_02_00000169_label.mat",
+    "category": "shovel"
+  },
+  {
+    "id": "shears_01_00000189",
+    "rgb": "data/umd/tools/shears_01/shears_01_00000189_rgb.jpg",
+    "label": "data/umd/tools/shears_01/shears_01_00000189_label.mat",
+    "category": "shears"
+  },
+  {
+    "id": "knife_08_00000016",
+    "rgb": "data/umd/tools/knife_08/knife_08_00000016_rgb.jpg",
+    "label": "data/umd/tools/knife_08/knife_08_00000016_label.mat",
+    "category": "knife"
+  },
+  {
+    "id": "spoon_10_00000280",
+    "rgb": "data/umd/tools/spoon_10/spoon_10_00000280_rgb.jpg",
+    "label": "data/umd/tools/spoon_10/spoon_10_00000280_label.mat",
+    "category": "spoon"
+  }
+]

@@ -1,0 +1,126 @@
+# =====================================================================
+# Datasets — large binary assets, users download themselves
+# =====================================================================
+data/umd/raw/
+data/umd/tools/
+data/umd/raw_*.tar.gz
+data/agd20k/
+data/iit-aff/
+*.tar.gz
+*.zip
+*.tar
+
+# =====================================================================
+# Model artifacts — regenerable from training scripts
+# =====================================================================
+outputs/checkpoints/
+outputs/predictions/
+outputs/predictions_500/
+outputs/h3/
+outputs/h3_saved/
+outputs/h6_saved/
+outputs/cache/
+outputs/logs/
+
+# Per-image prediction caches (large npy files in experiment results)
+experiments/*/data/
+experiments/*/results/*.npz
+experiments/*/results/*.pt
+experiments/h8-action-proxy/data/
+experiments/h9-handle-blade/results/h9_test_pred_grids.npz
+experiments/h10-multitool/results/h10b_cmp_pred_grids.npz
+experiments/h10-multitool/results/h10b_composites.npz
+experiments/h10-multitool/results/h10a_test_pred_grids.npz
+
+# Adapter weight checkpoints (regenerable)
+outputs/intervention/*.pt
+
+# =====================================================================
+# Video assets — large; kept on release page or external host
+# =====================================================================
+*.mp4
+*.mov
+*.avi
+*.webm
+
+# =====================================================================
+# Logs and run artifacts
+# =====================================================================
+*.log
+logs/
+runs/
+wandb/
+mlruns/
+tasks/
+slurm-*.out
+nohup.out
+
+# =====================================================================
+# Python
+# =====================================================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+ENV/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+.coverage
+htmlcov/
+build/
+dist/
+
+# =====================================================================
+# LaTeX build artifacts
+# =====================================================================
+*.aux
+*.bbl
+*.blg
+*.brf
+*.fdb_latexmk
+*.fls
+*.lof
+*.lot
+*.nav
+*.out
+*.snm
+*.synctex.gz
+*.toc
+*.vrb
+*.run.xml
+*-blx.bib
+
+# =====================================================================
+# IDE / OS
+# =====================================================================
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# =====================================================================
+# Local environment
+# =====================================================================
+.env
+.envrc
+.env.local
+*.local
+
+# =====================================================================
+# Project-specific
+# =====================================================================
+.claude/
+to_human/
+research-log.md
+research-state.yaml
+*.docx.pdf
+Project\ Proposal\ Presentation*

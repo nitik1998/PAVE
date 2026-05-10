@@ -1,0 +1,2 @@
+method,actual_backbone,n,mIoU,pixel_acc,IoU_background,IoU_grasp,IoU_cut,IoU_scoop,IoU_contain,IoU_support
+florence2,florence2,8,0.05202216037977797,0.19806344168526785,0.19422130609192964,0.013867335427182255,0.0,nan,0.0,nan

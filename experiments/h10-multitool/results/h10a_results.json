@@ -1,0 +1,154 @@
+{
+  "dinov2_base": {
+    "feat_dim": 768,
+    "n_train": 1004,
+    "n_val": 185,
+    "n_test": 193,
+    "cut_fraction_train": 0.13645418326693226,
+    "val": {
+      "accuracy": 1.0,
+      "balanced_accuracy": 1.0,
+      "f1_cut": 1.0,
+      "auc": 1.0
+    },
+    "test": {
+      "accuracy": 1.0,
+      "balanced_accuracy": 1.0,
+      "f1_cut": 1.0,
+      "auc": 1.0
+    }
+  },
+  "dinov2_large": {
+    "feat_dim": 1024,
+    "n_train": 1004,
+    "n_val": 185,
+    "n_test": 193,
+    "cut_fraction_train": 0.13645418326693226,
+    "val": {
+      "accuracy": 0.9945945945945946,
+      "balanced_accuracy": 0.9970238095238095,
+      "f1_cut": 0.9714285714285714,
+      "auc": 1.0
+    },
+    "test": {
+      "accuracy": 1.0,
+      "balanced_accuracy": 1.0,
+      "f1_cut": 1.0,
+      "auc": 1.0
+    }
+  },
+  "standalone_siglip": {
+    "feat_dim": 1152,
+    "n_train": 1004,
+    "n_val": 185,
+    "n_test": 193,
+    "cut_fraction_train": 0.13645418326693226,
+    "val": {
+      "accuracy": 0.9945945945945946,
+      "balanced_accuracy": 0.9970238095238095,
+      "f1_cut": 0.9714285714285714,
+      "auc": 1.0
+    },
+    "test": {
+      "accuracy": 1.0,
+      "balanced_accuracy": 1.0,
+      "f1_cut": 1.0,
+      "auc": 1.0
+    }
+  },
+  "pi0_siglip": {
+    "feat_dim": 1152,
+    "n_train": 1004,
+    "n_val": 185,
+    "n_test": 193,
+    "cut_fraction_train": 0.13645418326693226,
+    "val": {
+      "accuracy": 0.9945945945945946,
+      "balanced_accuracy": 0.9970238095238095,
+      "f1_cut": 0.9714285714285714,
+      "auc": 1.0
+    },
+    "test": {
+      "accuracy": 0.9896373056994818,
+      "balanced_accuracy": 0.9705882352941176,
+      "f1_cut": 0.9696969696969697,
+      "auc": 0.9998150203477617
+    }
+  },
+  "pi05_siglip": {
+    "feat_dim": 1152,
+    "n_train": 1004,
+    "n_val": 185,
+    "n_test": 193,
+    "cut_fraction_train": 0.13645418326693226,
+    "val": {
+      "accuracy": 1.0,
+      "balanced_accuracy": 1.0,
+      "f1_cut": 1.0,
+      "auc": 1.0
+    },
+    "test": {
+      "accuracy": 1.0,
+      "balanced_accuracy": 1.0,
+      "f1_cut": 1.0,
+      "auc": 1.0
+    }
+  },
+  "openvla_siglip": {
+    "feat_dim": 1152,
+    "n_train": 1004,
+    "n_val": 185,
+    "n_test": 193,
+    "cut_fraction_train": 0.13645418326693226,
+    "val": {
+      "accuracy": 1.0,
+      "balanced_accuracy": 1.0,
+      "f1_cut": 1.0,
+      "auc": 1.0
+    },
+    "test": {
+      "accuracy": 1.0,
+      "balanced_accuracy": 1.0,
+      "f1_cut": 1.0,
+      "auc": 1.0
+    }
+  },
+  "pi0_adapter": {
+    "feat_dim": 256,
+    "n_train": 1004,
+    "n_val": 185,
+    "n_test": 193,
+    "cut_fraction_train": 0.13645418326693226,
+    "val": {
+      "accuracy": 0.9945945945945946,
+      "balanced_accuracy": 0.9970238095238095,
+      "f1_cut": 0.9714285714285714,
+      "auc": 1.0
+    },
+    "test": {
+      "accuracy": 0.9844559585492227,
+      "balanced_accuracy": 0.9558823529411764,
+      "f1_cut": 0.9538461538461539,
+      "auc": 0.9981502034776175
+    }
+  },
+  "pi05_adapter": {
+    "feat_dim": 256,
+    "n_train": 1004,
+    "n_val": 185,
+    "n_test": 193,
+    "cut_fraction_train": 0.13645418326693226,
+    "val": {
+      "accuracy": 1.0,
+      "balanced_accuracy": 1.0,
+      "f1_cut": 1.0,
+      "auc": 1.0
+    },
+    "test": {
+      "accuracy": 0.9948186528497409,
+      "balanced_accuracy": 0.9968553459119497,
+      "f1_cut": 0.9855072463768116,
+      "auc": 1.0
+    }
+  }
+}

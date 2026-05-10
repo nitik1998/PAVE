@@ -1,0 +1,106 @@
+{
+  "dinov2_base": {
+    "feat_dim": 768,
+    "single_test": {
+      "balanced_accuracy": 1.0,
+      "f1_cut": 1.0,
+      "auc": 1.0
+    },
+    "composite_test": {
+      "balanced_accuracy": 0.9753753753753753,
+      "f1_cut": 0.9166666666666666,
+      "auc": 0.998026598026598
+    }
+  },
+  "dinov2_large": {
+    "feat_dim": 1024,
+    "single_test": {
+      "balanced_accuracy": 1.0,
+      "f1_cut": 1.0,
+      "auc": 1.0
+    },
+    "composite_test": {
+      "balanced_accuracy": 0.9405834405834406,
+      "f1_cut": 0.9195402298850575,
+      "auc": 0.9967395967395968
+    }
+  },
+  "standalone_siglip": {
+    "feat_dim": 1152,
+    "single_test": {
+      "balanced_accuracy": 1.0,
+      "f1_cut": 1.0,
+      "auc": 1.0
+    },
+    "composite_test": {
+      "balanced_accuracy": 0.9314028314028314,
+      "f1_cut": 0.9176470588235294,
+      "auc": 0.9955383955383955
+    }
+  },
+  "pi0_siglip": {
+    "feat_dim": 1152,
+    "single_test": {
+      "balanced_accuracy": 0.9705882352941176,
+      "f1_cut": 0.9696969696969697,
+      "auc": 0.9998150203477617
+    },
+    "composite_test": {
+      "balanced_accuracy": 0.927069927069927,
+      "f1_cut": 0.851063829787234,
+      "auc": 0.9865293865293866
+    }
+  },
+  "pi05_siglip": {
+    "feat_dim": 1152,
+    "single_test": {
+      "balanced_accuracy": 1.0,
+      "f1_cut": 1.0,
+      "auc": 1.0
+    },
+    "composite_test": {
+      "balanced_accuracy": 0.9502788502788503,
+      "f1_cut": 0.8073394495412844,
+      "auc": 0.994937794937795
+    }
+  },
+  "pi0_adapter": {
+    "feat_dim": 256,
+    "single_test": {
+      "balanced_accuracy": 0.9558823529411764,
+      "f1_cut": 0.9538461538461539,
+      "auc": 0.9981502034776175
+    },
+    "composite_test": {
+      "balanced_accuracy": 0.8550836550836551,
+      "f1_cut": 0.7857142857142857,
+      "auc": 0.9855855855855856
+    }
+  },
+  "pi05_adapter": {
+    "feat_dim": 256,
+    "single_test": {
+      "balanced_accuracy": 0.9968553459119497,
+      "f1_cut": 0.9855072463768116,
+      "auc": 1.0
+    },
+    "composite_test": {
+      "balanced_accuracy": 0.8942942942942943,
+      "f1_cut": 0.6376811594202898,
+      "auc": 0.9146289146289146
+    }
+  },
+  "openvla_siglip": {
+    "feat_dim": 1152,
+    "single_test": {
+      "balanced_accuracy": 1.0,
+      "f1_cut": 1.0,
+      "auc": 1.0
+    },
+    "composite_test": {
+      "balanced_accuracy": 0.9145002145002146,
+      "f1_cut": 0.8735632183908046,
+      "auc": 0.992020592020592
+    }
+  }
+}

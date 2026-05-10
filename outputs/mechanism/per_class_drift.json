@@ -1,0 +1,44 @@
+{
+  "bg": {
+    "n_patches": 18503,
+    "cos_standalone_pi0": 0.7158224582672119,
+    "cos_standalone_pi05": 0.5417019724845886,
+    "l2_standalone_pi0": 8.597227096557617,
+    "l2_standalone_pi05": 4.607035160064697
+  },
+  "grasp": {
+    "n_patches": 66,
+    "cos_standalone_pi0": 0.5394644737243652,
+    "cos_standalone_pi05": 0.4853155314922333,
+    "l2_standalone_pi0": 4.50166654586792,
+    "l2_standalone_pi05": 4.964853763580322
+  },
+  "cut": {
+    "n_patches": 17,
+    "cos_standalone_pi0": 0.5007131695747375,
+    "cos_standalone_pi05": 0.5217081308364868,
+    "l2_standalone_pi0": 3.7633492946624756,
+    "l2_standalone_pi05": 3.844296455383301
+  },
+  "scoop": {
+    "n_patches": 29,
+    "cos_standalone_pi0": 0.6431112289428711,
+    "cos_standalone_pi05": 0.6025551557540894,
+    "l2_standalone_pi0": 3.236898899078369,
+    "l2_standalone_pi05": 3.8910953998565674
+  },
+  "contain": {
+    "n_patches": 55,
+    "cos_standalone_pi0": 0.6573572158813477,
+    "cos_standalone_pi05": 0.6212515830993652,
+    "l2_standalone_pi0": 3.372821807861328,
+    "l2_standalone_pi05": 3.892836570739746
+  },
+  "support": {
+    "n_patches": 18,
+    "cos_standalone_pi0": 0.5729963183403015,
+    "cos_standalone_pi05": 0.6080353856086731,
+    "l2_standalone_pi0": 2.6082630157470703,
+    "l2_standalone_pi05": 3.7795357704162598
+  }
+}

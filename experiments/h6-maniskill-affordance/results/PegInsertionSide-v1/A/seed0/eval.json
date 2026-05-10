@@ -1,0 +1,10 @@
+{
+  "env_id": "PegInsertionSide-v1",
+  "arm": "A",
+  "seed": 0,
+  "total_steps": 200000,
+  "n_eval_envs": 64,
+  "mean_return": 3.2618796825408936,
+  "mean_success": 0.0,
+  "wallclock_total": 119.04876708984375
+}
