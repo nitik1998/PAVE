@@ -124,3 +124,7 @@ research-log.md
 research-state.yaml
 *.docx.pdf
 Project\ Proposal\ Presentation*
+
+# Local-only — never publish in public repo
+/report/
+/PAVE-submission.zip
