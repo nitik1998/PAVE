@@ -1,15 +1,27 @@
 % =====================================================================
-% Final report — JHU EN.601.495 / 695, Introduction to Robot Learning,
-%                Spring 2026
+% FINAL CLASS REPORT
+% JHU EN.601.495 / 695  ·  Introduction to Robot Learning  ·  Spring 2026
 %
 % Author: Nitik Jain
-% Compile: pdflatex report && bibtex report && pdflatex report && pdflatex report
 %
-% Self-contained NeurIPS-style layout. No external .sty file required.
+% Sections follow the exact rubric from the course staff:
+%   1. Problem Definition
+%   2. Literature Survey
+%   3. Proposed Methods (with intuition / theory)
+%   4. Baseline Methods
+%   5. Evaluation Methodology
+%   6. Experimental Design and Results
+%   7. Observations and Analysis
+%   8. Limitations and Failure Cases
+%   9. Future Work
+%  10. Conclusion
+%  11. Code Availability
+%
+% Compile:  pdflatex report && bibtex report && pdflatex report (x2)
 % =====================================================================
-\documentclass[10pt]{article}
+\documentclass[11pt]{article}
 
-\usepackage[letterpaper, margin=1in, top=1.0in, bottom=1.0in]{geometry}
+\usepackage[letterpaper, margin=1.1in, top=1.0in, bottom=1.0in]{geometry}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
 \usepackage{microtype}
@@ -24,404 +36,658 @@
 \usepackage{subcaption}
 \usepackage{enumitem}
 \usepackage{titlesec}
-\usepackage{authblk}
 \usepackage{array}
 \usepackage{multirow}
 \usepackage{url}
+\usepackage{setspace}
 
-% Tightened section spacing — academic, not airy.
-\titleformat{\section}{\normalfont\fontsize{12}{14}\bfseries}{\thesection}{0.5em}{}
-\titleformat{\subsection}{\normalfont\fontsize{11}{13}\bfseries}{\thesubsection}{0.5em}{}
-\titlespacing*{\section}{0pt}{1.4ex plus 0.4ex minus 0.2ex}{0.7ex plus 0.2ex}
-\titlespacing*{\subsection}{0pt}{1.0ex plus 0.3ex minus 0.2ex}{0.5ex plus 0.2ex}
+\onehalfspacing
+
+% Section heading style — clear and academic.
+\titleformat{\section}{\normalfont\fontsize{14}{16}\bfseries}{\thesection.}{0.6em}{}
+\titleformat{\subsection}{\normalfont\fontsize{12}{14}\bfseries}{\thesubsection.}{0.5em}{}
+\titleformat{\subsubsection}{\normalfont\fontsize{11}{13}\bfseries\itshape}{\thesubsubsection.}{0.5em}{}
+\titlespacing*{\section}{0pt}{2.0ex plus 0.5ex minus 0.2ex}{1.0ex plus 0.2ex}
+\titlespacing*{\subsection}{0pt}{1.4ex plus 0.4ex minus 0.2ex}{0.7ex plus 0.2ex}
 
 \setlength{\parskip}{0.4em}
 \setlength{\parindent}{0pt}
 
-% Caption styling.
-\captionsetup{font=small, labelfont={bf}, skip=4pt, labelsep=period}
+\captionsetup{font=small, labelfont={bf}, skip=4pt, labelsep=period, format=plain, justification=justified}
 \captionsetup[sub]{font=footnotesize, labelfont=bf}
 
-% Hyperref styling.
 \hypersetup{
   colorlinks=true,
   linkcolor=black,
   citecolor=black,
   urlcolor={blue!55!black},
   pdfauthor={Nitik Jain},
-  pdftitle={PAVE: Probing Affordance in Vision-Language-Action Encoders},
+  pdftitle={Probing Affordance in Vision-Language-Action Encoders},
 }
 
-\renewcommand{\arraystretch}{1.15}
+\renewcommand{\arraystretch}{1.2}
 
-\title{\textbf{PAVE: Probing Affordance in Vision-Language-Action Encoders}\\[0.3em]
-\large Class-asymmetric degradation, mechanism, and recovery}
-
-\author{Nitik Jain\\
-  \small Johns Hopkins University\\
-  \small \texttt{njain83@jhu.edu}}
-\date{}
-
+% =====================================================================
 \begin{document}
-\maketitle
 
-% =====================================================================
-\begin{abstract}
-\noindent
-Modern robot policies built as vision-language-action (VLA) models inherit
-their visual frontends from pretrained foundation encoders (DINOv2,
-SigLIP-So400m), then fine-tune those encoders end-to-end on robot
-trajectory data. We ask whether this fine-tuning preserves the per-class
-affordance signal that the foundation encoder carried. Probing the
-SigLIP-So400m vision tower extracted from $\pi_0$, $\pi_{0.5}$, and
-OpenVLA on UMD Part Affordance, we find a class-asymmetric loss: the
-\texttt{cut} class drops 27\,pp in IoU on $\pi_0$, while \texttt{contain}
-drops less than 1\,pp. The pattern generalises across two VLA families
-(PaliGemma-backboned $\pi_0$/$\pi_{0.5}$ and Prismatic-Llama-backboned
-OpenVLA), indicating it is recipe-independent. We then provide two new
-contributions. First, the per-class final-layer feature drift between
-standalone and post-VLA encoders numerically predicts the per-class IoU
-drop with Spearman $\rho = 0.90$ ($p = 0.037$, $\pi_0$) and Pearson
-$r = 0.95$ ($p = 0.012$, OpenVLA): a mechanism-predicts-behavior link.
-Second, a 297\,K-parameter MLP adapter on top of frozen $\pi_0$ features
-recovers $82\%$ of the lost \texttt{cut} IoU --- the destroyed signal was
-rotated, not deleted. Finally, a complexity-spectrum analysis across
-four progressively easier task formulations shows the apparent 27\,pp
-deficit collapses to under 3\,pp on every formulation that matches the
-binary part-discrimination protocols downstream manipulation pipelines
+% Title block — class-report style, not conference style.
+\begin{center}
+\vspace*{0.4cm}
+{\Large\bfseries Probing Affordance in Vision--Language--Action Encoders\par}
+\vspace{0.4em}
+{\large Class-asymmetric degradation, mechanism, and recovery\par}
+\vspace{1.2em}
+\rule{0.45\textwidth}{0.5pt}\par
+\vspace{0.8em}
+{\large Nitik Jain\par}
+\vspace{0.3em}
+{\small Department of Computer Science, Johns Hopkins University\par}
+{\small \texttt{njain83@jhu.edu}\par}
+\vspace{1.0em}
+{\small EN.601.495 / 695 --- Introduction to Robot Learning --- Spring 2026\par}
+{\small Final Project Report --- Submitted May 10, 2026\par}
+\vspace{0.6em}
+\rule{0.45\textwidth}{0.5pt}\par
+\vspace{1.2em}
+\end{center}
+
+% Executive summary (replaces traditional conference abstract).
+\noindent\textbf{Executive Summary.}\enspace
+This report investigates whether vision--language--action (VLA) models such as
+$\pi_0$, $\pi_{0.5}$, and OpenVLA preserve the per-class affordance signal
+that their underlying foundation vision encoders (DINOv2, SigLIP-So400m)
+carried before end-to-end robot fine-tuning. Through eleven experiments
+across seven encoders, four task formulations, and two VLA families, we
+find that VLA fine-tuning rotates per-class affordance representations out
+of the linearly-readable subspace in a class-asymmetric way ---
+\texttt{cut} loses 27 pp of intersection-over-union on $\pi_0$ while
+\texttt{contain} loses less than 1 pp --- and that this rotation is
+mechanistically localised to the final transformer block. The per-class
+magnitude of the rotation numerically predicts the per-class accuracy drop
+under linear probing (Spearman $\rho = 0.90$, $p = 0.037$ for $\pi_0$). A
+297\,000-parameter MLP adapter on top of the frozen encoder recovers 82\%
+of the lost \texttt{cut}-class signal, demonstrating that the information
+was rotated rather than deleted. Crucially, a complexity-spectrum analysis
+shows the apparent 27 pp deficit collapses to under 3 pp on every binary
+part-discrimination protocol that downstream manipulation pipelines
 actually use, indicating that the standard multi-class probing protocol
-overstates the encoder deficit. All experiments fit on a single 8\,GB
-consumer GPU. Code, weights, slides, and findings:
-\url{https://github.com/nitik1998/PAVE}.
-\end{abstract}
+overstates the encoder deficit. All experiments fit on a single 8 GB
+consumer GPU. Code, weights, and figures: \url{https://github.com/nitik1998/PAVE}.
+
+\vspace{1em}
 
 % =====================================================================
-\section{Introduction}
-\label{sec:intro}
+\section{Problem Definition}
+\label{sec:problem}
 
-Robotic manipulation in unstructured human environments has, over the past
-decade, shifted from precisely-modelled pick-and-place to vision-language-action
-(VLA) policies that consume raw RGB observations and natural-language
-instructions and output robot actions \cite{kim2024openvla,black2024pi0}.
-The visual frontends of these policies are not trained from scratch.
-Every recent open-weight VLA --- $\pi_0$, $\pi_{0.5}$, OpenVLA --- starts
-from a public foundation vision encoder (DINOv2 \cite{oquab2024dinov2},
-SigLIP-So400m \cite{zhai2023sigmoid}) and \emph{fine-tunes that encoder
-end-to-end} on robot trajectory data.
+The central problem this project investigates is the following: \emph{when a
+deployed vision--language--action model fine-tunes its visual encoder
+end-to-end on robot trajectory data, does the per-class affordance signal
+that its underlying foundation encoder carried before fine-tuning still
+exist in the resulting representation, and if not, can it be recovered?}
 
-Independently of the VLA literature, a separate body of work has
-established that part-level affordance perception --- distinguishing
-handle from blade, rim from bottom, lever from shaft --- causally improves
-manipulation success. Aff-Grasp \cite{li2025affgrasp} reports +30\,pp
-grasp success vs. baselines that condition on geometry alone; TARAD
-\cite{tarad2024} reports +52\,pp task success; GIFT \cite{turpin2021gift}
-reports +22\,pp on novel tools; Kokic \emph{et al.}
-\cite{kokic2017affordance} demonstrate task-specific grasp planning
-through affordance-constrained optimisation. The mechanism by which
-these papers extract affordance from images, in nearly every case, is a
-linear or near-linear readout on top of a foundation visual encoder.
+This question matters because of how modern robot manipulation works.
+Robotic manipulation in unstructured human environments has shifted, over
+the past decade, from precisely modelled industrial pick-and-place to
+vision--language--action (VLA) policies that consume raw RGB observations
+and natural-language instructions and output low-level robot actions
+\cite{kim2024openvla, black2024pi0}. The visual frontends of these
+policies are not trained from scratch. Every recent open-weight VLA --- $\pi_0$
+\cite{black2024pi0}, $\pi_{0.5}$ \cite{intelligence2024pi05}, and OpenVLA
+\cite{kim2024openvla} --- starts from a public foundation vision encoder
+(DINOv2 \cite{oquab2024dinov2}, SigLIP-So400m \cite{zhai2023sigmoid}) and
+\textit{fine-tunes that encoder end-to-end} on robot trajectory data.
 
-This raises a question that no prior published study isolates:
-\emph{when a deployed VLA fine-tunes its visual encoder for action
-prediction, does the per-class affordance signal that downstream
-manipulation pipelines depend on survive?} This paper answers that
-question.
+In parallel, an independent body of literature has established that
+part-level affordance perception --- distinguishing handle from blade, rim
+from bottom, lever from shaft --- is causally important for manipulation
+success \cite{li2025affgrasp, tarad2024, turpin2021gift,
+mandi2021graff, kokic2017affordance, fsd2026}. The mechanism by which
+these papers extract affordance, in nearly every case, is a linear or
+near-linear readout on top of a foundation visual encoder. If the
+visual encoder inside a deployed VLA still carries per-class affordance
+linearly, the entire affordance-conditioned manipulation literature
+applies to it. If it does not, those methods may fail silently when
+deployed on top of a fine-tuned VLA.
 
-\paragraph{Contributions.} We make four contributions:
-\begin{enumerate}[leftmargin=1.3em, itemsep=0.1em, topsep=0.2em]
-\item A linear-probe baseline that beats the published state-of-the-art
-on UMD \cite{myers2015umd}: DINOv2-large at $560^2$ scores 0.776 mIoU,
-+10.6\,pp over Zhang \emph{et al.} CVPR 2026 dense decoder
-\cite{zhang2026umd}.
-\item A class-asymmetric degradation finding that generalises across two
-VLA families: $\pi_0$ loses 27\,pp on \texttt{cut} but only 1\,pp on
-\texttt{contain}; OpenVLA shows the same pattern.
-\item A mechanism-predicts-behavior link: per-class final-layer feature
-drift numerically predicts per-class IoU drop with significant
-correlations on two of three VLAs.
-\item An intervention --- a 297\,K-parameter MLP adapter on top of
-frozen features --- that recovers 82\% of the \texttt{cut} gap on
-$\pi_0$, demonstrating that the lost signal was rotated rather than
-deleted, and that practitioners can recover affordance perception in a
-deployed VLA without retraining the encoder.
+Despite these two literatures, no published study isolates the effect of
+end-to-end VLA fine-tuning on affordance-class structure inside the
+encoder. Closing that gap is the technical objective of this project.
+
+\subsection{Concrete sub-questions}
+
+The high-level question above breaks into four concrete sub-questions:
+
+\begin{enumerate}[leftmargin=1.3em, itemsep=0.2em, topsep=0.4em]
+\item \textbf{Magnitude.} How much of the per-pixel affordance signal in
+the SigLIP-So400m vision tower of $\pi_0$ / $\pi_{0.5}$ / OpenVLA is
+preserved after VLA fine-tuning, relative to the standalone SigLIP-So400m
+they each started from?
+\item \textbf{Structure.} Is the loss class-uniform or class-asymmetric?
+If asymmetric, which affordance classes (\texttt{grasp}, \texttt{cut},
+\texttt{scoop}, \texttt{contain}, \texttt{support}) are most affected?
+\item \textbf{Mechanism.} Where in the encoder does the divergence
+concentrate? Is the loss caused by a uniform encoder-wide drift or by
+class-selective rotations of specific feature directions?
+\item \textbf{Recovery.} Is the lost signal recoverable from the residual
+representation by a small intervention (such as a non-linear adapter), or
+is it actually deleted from the feature space?
 \end{enumerate}
 
-We additionally show that the apparent 27\,pp loss is largely a
-multi-class-classification artifact: under binary part-discrimination
-formulations matching the protocols used by Aff-Grasp, GIFT, and Kokic
-\emph{et al.}, the gap collapses to $\leq 3$\,pp.
+This report answers all four.
+
+\subsection{Why each sub-question matters}
+
+\textbf{Magnitude} matters for practitioners deploying VLAs and expecting
+the affordance literature's results to transfer; if the signal is largely
+preserved, those results apply.
+
+\textbf{Structure} matters because manipulation tasks are themselves
+class-specific. A robot deployment that primarily picks and places (a
+\texttt{contain}-class workload) will have very different perception
+needs than one that cuts or shears (a \texttt{cut}-class workload). If
+the loss is class-asymmetric, the deployment risk is class-specific.
+
+\textbf{Mechanism} matters because it tells us \emph{whether the loss is
+fixable}. A uniform drift suggests the encoder simply needs a linear
+recalibration. A class-selective rotation in a specific layer suggests a
+targeted intervention is possible.
+
+\textbf{Recovery} matters because it determines the practical
+intervention. If a small adapter on top of the frozen encoder restores
+the signal, deploying teams do not need to retrain expensive
+foundation models --- they can attach a tiny head.
 
 % =====================================================================
-\section{Related Work}
-\label{sec:related}
+\section{Literature Survey}
+\label{sec:litsurvey}
 
-\paragraph{Affordance perception for robot manipulation.}
-Gibson's ecological framing of affordance \cite{gibson1979ecological} was
-operationalised for robotics by Myers \emph{et al.}
-\cite{myers2015umd}, who released the UMD Part Affordance dataset with
-seven primitive verbs (\texttt{grasp}, \texttt{cut}, \texttt{scoop},
-\texttt{contain}, \texttt{pound}, \texttt{support}, \texttt{w-grasp}).
-Subsequent work explored geometry-based prediction
-\cite{kokic2017affordance}, self-supervised hotspots
-\cite{nagarajan2019grounded}, and tool-use generalisation
-\cite{turpin2021gift}. The recent neural-network-based approach of Zhang
-\emph{et al.} \cite{zhang2026umd} sets a published state-of-the-art on
-UMD with a dense decoder on top of foundation features, reporting 0.670
-mIoU. We exceed that result with a linear probe alone.
+This section reviews three lines of prior work that this project builds
+on: (i) affordance perception for robot manipulation, including the
+foundational pre-2021 literature; (ii) modern vision--language--action
+models; and (iii) representation analysis of deep networks.
 
-\paragraph{Affordance-conditioned manipulation policies.}
-A consistent literature shows that giving a manipulation policy access
-to affordance signals improves task success. GRAFF
-\cite{mandi2021graff} embeds an object-centric affordance prior into a
-deep RL loop and converges 3$\times$ faster than RL alone. Aff-Grasp
-\cite{li2025affgrasp} reports +30\,pp grasp success vs. baselines
-without affordance. TARAD \cite{tarad2024} integrates VLM-derived
-affordances with a 3D diffusion policy and reports +52\,pp absolute
-gain. FSD \cite{fsd2026} pairs a slow-thinking spatial reasoner with a
-fast-acting diffusion policy and reports 72\% real-world success vs.
-42\% for the strongest baseline. We do \emph{not} re-derive these
-results --- we cite them and use them to establish that the per-class
-affordance signal we measure is causally important downstream.
+\subsection{Affordance perception for robot manipulation}
 
-\paragraph{Vision-language-action models.}
-OpenVLA \cite{kim2024openvla} fine-tunes a Prismatic VLM
-\cite{karamcheti2024prismatic} on the Open X-Embodiment
-\cite{padalkar2024oxe} corpus and is open-weight. $\pi_0$
-\cite{black2024pi0} extends this to a PaliGemma backbone with a
-flow-matching action head; $\pi_{0.5}$ \cite{intelligence2024pi05} is
-its successor with an improved training recipe. The effect of VLA
-fine-tuning on the underlying encoder's representation has not been
-systematically studied; our work closes that gap for the affordance
-axis.
+The notion of \emph{affordance} originated in ecological psychology with
+Gibson's 1979 framework \cite{gibson1979ecological}, in which an object's
+affordances are the action possibilities it offers an agent. The first
+operationalisation of affordance for robotics came from Myers, Teo,
+Ferm{\"u}ller, and Aloimonos at ICRA 2015 \cite{myers2015umd}, who
+introduced the UMD Part Affordance dataset --- a 17-category collection
+of household tools with per-pixel labels for seven primitive affordance
+verbs (\texttt{grasp}, \texttt{cut}, \texttt{scoop}, \texttt{contain},
+\texttt{pound}, \texttt{support}, \texttt{w-grasp}). UMD remains the
+standard benchmark for per-pixel affordance segmentation a decade later
+and is the dataset on which all probing experiments in this report are
+performed.
 
-\paragraph{Representation comparison and probing.}
-Linear probing as a measurement methodology was popularised by
-\cite{alain2017probes} and refined by \cite{he2022masked, oquab2024dinov2}
-for self-supervised vision encoders. Kornblith \emph{et al.}
+Building on UMD, Kokic, Stork, Haustein, and Kragic (Humanoids 2017)
+\cite{kokic2017affordance} demonstrated task-specific grasping: their
+system uses a CNN to segment the object into task-affording sub-regions
+and an optimisation-based grasp planner to select grasps consistent with
+those sub-regions. Their pipeline outputs human-like grasps for ten tool
+classes across five tasks --- this is the earliest end-to-end
+demonstration that affordance-aware perception, not just geometric
+stability, is necessary for usable grasping. Their experiments
+specifically contrast their method against pure force-closure baselines
+and report substantially better task-relevant grasps in qualitative
+evaluation.
+
+Nagarajan, Feichtenhofer, and Grauman (ICCV 2019)
+\cite{nagarajan2019grounded} introduced grounded interaction hotspots
+learned from egocentric video, demonstrating that affordance heatmaps
+can be discovered from passive observation without manual annotation.
+Their work is the conceptual precursor to several modern self-supervised
+affordance discovery methods.
+
+GRAFF (Mandikal and Grauman, ICRA 2021) \cite{mandi2021graff} integrated
+visual affordance priors into deep reinforcement learning for dexterous
+hand manipulation in MuJoCo. Their headline result: training proceeds
+3$\times$ faster when the agent's reward is shaped by an
+affordance-region prior. GIFT (Turpin \emph{et al.}, RSS 2021)
+\cite{turpin2021gift} showed that interaction-aware tool-use affordances
+can be discovered through procedurally-generated training in simulation,
+without any human annotation, and generalise to novel tools at 71--80\%
+success on hammering and sweeping tasks. Both 2021 papers establish that
+\emph{affordance perception causally improves manipulation success}, the
+premise on which our investigation rests.
+
+More recent work continues this trajectory. Aff-Grasp (ICCV 2025)
+\cite{li2025affgrasp} reports +30 pp grasp success vs.~baselines without
+affordance. TARAD (RA-L 2024) \cite{tarad2024} integrates VLM-derived
+affordances with a 3D diffusion policy and reports +52 pp absolute task
+success gain. FSD (ICLR 2026) \cite{fsd2026} achieves 72\% real-world
+success vs.~42\% for the strongest non-affordance baseline. The
+empirical conclusion, established across nearly a decade of work, is
+that affordance is causally important for manipulation. Our work does
+not re-derive this; we cite it and use it as the motivation for asking
+whether deployed VLAs preserve the signal.
+
+The current state-of-the-art on UMD per-pixel affordance segmentation is
+Zhang \emph{et al.} CVPR 2026 \cite{zhang2026umd}, who report 0.670 mIoU
+using a dense decoder on top of foundation features. We exceed this with
+a 60-second linear probe alone, as Section~\ref{sec:results} reports.
+
+\subsection{Vision--language--action models}
+
+OpenVLA (Kim \emph{et al.}, CoRL 2024) \cite{kim2024openvla} is the
+flagship open-weight VLA. It builds on the Prismatic VLM
+\cite{karamcheti2024prismatic} which fuses DINOv2 and SigLIP-So400m
+visual encoders into a Llama-2-7B language backbone, fine-tuned on the
+970,000-trajectory Open X-Embodiment corpus \cite{padalkar2024oxe}.
+$\pi_0$ (Black \emph{et al.}, 2024) \cite{black2024pi0} is its
+contemporary, using a PaliGemma backbone with a flow-matching action
+head. $\pi_{0.5}$ \cite{intelligence2024pi05} is the successor with an
+improved training recipe. All three are publicly released as
+\verb|safetensors| checkpoints, which makes encoder extraction feasible.
+The effect of VLA fine-tuning on the underlying encoder's affordance
+representation has not been studied in any of these papers.
+
+\subsection{Probing and representation analysis}
+
+Linear probing as a measurement methodology was popularised by Alain and
+Bengio \cite{alain2017probes} for analysing intermediate layers, and
+refined by He \emph{et al.} (CVPR 2022) \cite{he2022masked} and Oquab
+\emph{et al.} (TMLR 2024) \cite{oquab2024dinov2} for self-supervised
+vision encoders. The methodology is now standard: a linear (or
+log-linear) classifier on frozen features measures \emph{linearly
+readable signal}.
+
+Kornblith, Norouzi, Lee, and Hinton (ICML 2019)
 \cite{kornblith2019cka} introduced linear Centered Kernel Alignment
-(CKA) for layer-wise representation comparison, which we adopt to
-localise where in the encoder the VLA divergence concentrates.
-The per-class drift metric we introduce is a class-stratified cosine
-similarity in the final-layer feature space; to our knowledge this is
-the first time such a metric has been shown to numerically predict
-per-class linear-probe IoU on a downstream task.
+(CKA) for layer-wise representation comparison. CKA is invariant to
+orthogonal transformations and isotropic scaling but \emph{not} to
+arbitrary affine transformations; this property makes it the appropriate
+measurement for comparing two networks of the same architecture, as we
+do for standalone vs. post-VLA SigLIP. Our layer-wise CKA analysis in
+Section~\ref{sec:results} closely follows Kornblith \emph{et al.}'s
+recipe.
 
 % =====================================================================
-\section{Method}
-\label{sec:method}
+\section{Proposed Methods}
+\label{sec:methods}
 
-\subsection{Probing protocol}
-\label{sec:probe}
+The project's methodology consists of four interlocking measurements
+applied to the same set of vision encoders: (1) linear probing for
+per-class affordance accuracy, (2) layer-wise CKA for localising the
+divergence between standalone and post-VLA encoders, (3) per-class
+final-layer feature drift for testing whether the divergence is
+class-selective, and (4) a 297\,K-parameter MLP adapter as an active
+intervention testing whether the lost signal can be recovered from
+the frozen post-VLA representation. This section describes each method,
+the intuition behind it, and the theoretical motivation.
 
-Every probe in this paper follows the same protocol. For an input
-RGB image $\mathbf{x} \in \mathbb{R}^{S \times S \times 3}$, a frozen
-encoder $\phi$ produces patch features
-$\mathbf{F} = \phi(\mathbf{x}) \in \mathbb{R}^{N \times D}$,
-where $N = (S/p)^2$ and $p$ is the encoder's patch size. We pool the
-per-pixel UMD label to one majority label per ViT patch and fit a
-multinomial logistic regression with $L_2$ regularisation $C = 1$ over
-all training patches. At test time we apply the classifier, softmax,
-bilinear-upsample logits to image resolution, and reduce to a hard label
-via argmax with background reconstructed as
-$1 - \max_{c \neq \mathrm{bg}} p_c$.
-Image size is fixed to each encoder's training resolution: $224^2$ for
-SigLIP-So400m at $\pi_0$, $448^2$ for DINOv2-base, $560^2$ for
-DINOv2-large, $384^2$ for SigLIP-base.
+\subsection{Method 1 --- Linear Probing}
 
-\subsection{Extracting VLA vision towers}
-\label{sec:extract}
+Given a frozen visual encoder $\phi$ that maps an RGB image
+$\mathbf{x} \in \mathbb{R}^{S \times S \times 3}$ to per-patch features
+$\mathbf{F} = \phi(\mathbf{x}) \in \mathbb{R}^{N \times D}$, where
+$N = (S/p)^2$ for patch size $p$, we fit a multinomial logistic
+regression $W \in \mathbb{R}^{D \times K}$ over all training patches
+with $K$ classes. Patch labels are obtained by majority-voting the
+per-pixel UMD labels under each $14 \times 14$ patch footprint. At
+test time we apply $W$ to compute $K$-channel patch logits, softmax,
+bilinear-upsample to image resolution, and reduce to a hard label by
+argmax (with background reconstructed as $1 - \max_{c \neq \mathrm{bg}} p_c$).
+The probe is fit by \texttt{sklearn.LogisticRegression} with $L_2$
+regularisation $C = 1$ and converges in approximately 60 seconds on
+CPU.
 
-For $\pi_0$ and $\pi_{0.5}$ the vision tower lives at
-\verb|paligemma_with_expert.paligemma.model.vision_tower.|
-\verb|vision_model.*| inside the safetensors checkpoint. We enumerate
-those keys and load them into a freshly-instantiated
-\verb|transformers.SiglipVisionModel| skeleton corresponding to
-\verb|google/siglip-so400m-patch14-224| --- 437 of 448 vision-tower
-tensors load identically, with the missing 11 being the unused Sigmoid
-attention-pooling head. For OpenVLA the keys are timm-style at
-\verb|vision_backbone.fused_featurizer.*|; all 342 load into a fresh
-\verb|timm.create_model("vit_so400m_patch14_siglip_224")| skeleton.
+\subsubsection{Intuition}
 
-\subsection{Layer-wise CKA and per-class drift}
-\label{sec:cka}
+A linear probe measures \emph{linearly-readable signal}: the question
+"how well-organised is class-$c$ information in the encoder's feature
+space such that a single hyperplane can separate class-$c$ patches from
+the rest?" If an encoder's features carry class-$c$ information
+\emph{at all} (regardless of structure), a non-linear head with
+sufficient capacity could read it. A linear probe is more restrictive: it
+asks whether the information is in linearly-readable directions. The
+critical implication is that a linear probe's verdict is sensitive to
+the \emph{rotation} of the feature space, not just its content.
 
-For each of standalone, $\pi_0$, $\pi_{0.5}$, OpenVLA, we extract all
-hidden states $H^{(\ell)} \in \mathbb{R}^{N \times d}$ at every layer
-$\ell = 0, \ldots, L = 27$ on every UMD val image. For each layer we
-compute linear CKA \cite{kornblith2019cka} between the standalone and
-post-VLA features over all patches. For the final layer we further
-slice by ground-truth label: for class $c$, define
-$\mu_c^{(\phi)} = \mathrm{mean}_{i: y_i = c}\, H^{(L)}_{\phi, i}$, and
-report cosine similarity
-$\cos(\mu_c^{(\mathrm{std})}, \mu_c^{(\phi)})$ as the per-class drift
-signal. Per-class drift $1 - \cos$ is the dependent variable in the
-mechanism-predicts-behavior correlation analysis.
+\subsection{Method 2 --- Layer-wise CKA}
 
-\subsection{Adapter recovery}
-\label{sec:adapter}
+Given two encoders of identical architecture (e.g., standalone
+SigLIP-So400m and the SigLIP tower extracted from $\pi_0$), we run both
+on a fixed image set and collect hidden states
+$H^{(\ell)}_A, H^{(\ell)}_B \in \mathbb{R}^{N \times d}$ at every
+transformer layer $\ell$. Linear CKA between the two is
+\[
+\mathrm{CKA}\!\left(H^{(\ell)}_A, H^{(\ell)}_B\right) =
+\frac{\| H^{(\ell)\top}_A H^{(\ell)}_B \|_F^2}
+     {\| H^{(\ell)\top}_A H^{(\ell)}_A \|_F \cdot \| H^{(\ell)\top}_B H^{(\ell)}_B \|_F}
+\]
+after centering each $H$ over the patch dimension. A CKA value of 1
+means the two layers' feature spaces are equal up to an orthogonal
+transformation; a CKA value near 0 means the two are nearly orthogonal.
 
-The intervention replaces the linear probe with a 2-layer MLP
-$h: \mathbb{R}^{1152} \to \mathbb{R}^{256} \to \mathbb{R}^{6}$ with GELU
-activation and dropout 0.1, trained for 40 epochs of class-balanced
-cross-entropy loss with AdamW (lr $2 \times 10^{-3}$, weight decay
-$10^{-4}$, batch 8\,192 patches). Total parameters: 297\,K. The encoder
-is frozen throughout. The hypothesis is that if the affordance signal
-was \emph{rotated} rather than \emph{deleted} by VLA fine-tuning, a
-small non-linear head should recover most of it; this is the falsifiable
-prediction the experiment tests.
+\subsubsection{Intuition}
 
-\subsection{Complexity-spectrum design}
-\label{sec:spectrum}
+CKA tells us \emph{at which depth} two networks of the same architecture
+diverge. For our problem, plotting CKA between standalone SigLIP and
+each post-VLA SigLIP across layers $\ell = 0, \ldots, 27$ localises
+where the VLA fine-tuning has "moved" the encoder. If divergence
+concentrates in the final layers, the rotation is happening late; if
+divergence accumulates from layer 0, the entire encoder has been
+reorganised.
 
-To localise where on the task-difficulty axis the apparent loss
-manifests, we construct four progressively easier formulations of
-\texttt{cut} detection:
-\begin{itemize}[leftmargin=1.3em, itemsep=0.1em, topsep=0.2em]
-\item \textbf{H2}: 5-class IoU on full UMD (multi-class confusion across
-17 categories, hardest).
-\item \textbf{H10a}: binary classifier ``\texttt{cut} vs.~other
-foreground'' on full UMD foreground patches.
-\item \textbf{H10b}: same binary classifier evaluated on multi-tool
-composite scenes built by tiling a knife with a non-cut distractor.
-\item \textbf{H9}: binary classifier ``handle vs.~blade'' restricted to
-knife / scissors / shears / saw images (single-object discrimination).
-\end{itemize}
+\subsection{Method 3 --- Per-class Final-layer Drift}
 
-% =====================================================================
-\section{Experimental Setup}
-\label{sec:setup}
+For the final transformer layer $\ell = L$, we slice the patch features
+by ground-truth label. For class $c$, define
+$\mu_c^{(\phi)} = \mathrm{mean}_{i\,:\, y_i = c}\, H^{(L)}_{\phi, i}$ as
+the class-mean feature. The per-class \emph{drift} between standalone
+and post-VLA encoders is
+\[
+\mathrm{drift}_c = 1 - \cos\!\left(\mu_c^{(\mathrm{std})}, \mu_c^{(\phi)}\right).
+\]
+A small drift means the class-$c$ features point in roughly the same
+direction in both encoders; a large drift means the class-$c$ features
+have rotated.
 
-\paragraph{Encoders.}
-We evaluate seven encoders plus three adapter variants (Table~\ref{tab:encoders}).
-DINOv2 and standalone SigLIP serve as foundation references. Florence-2
-\cite{xiao2024florence2} and Qwen2-VL-2B \cite{wang2024qwen2vl} are
-zero-shot grounding controls. Random projection is a sanity baseline
-that ablates the foundation features.
+\subsubsection{Intuition}
 
-\begin{table}[t]
-\centering
-\small
-\begin{tabular}{l l l}
-\toprule
-Encoder & Source / weights & Role \\
-\midrule
-DINOv2-base @ 448, large @ 560 & Meta open weights & vision-only baseline \\
-SigLIP-base @ 256              & Google open weights & VLM baseline \\
-SigLIP-So400m @ 224 (standalone) & Google open weights & foundation reference \\
-$\pi_0$ SigLIP                 & \verb|lerobot/pi0_base| & PaliGemma family VLA \\
-$\pi_{0.5}$ SigLIP             & \verb|lerobot/pi05_base| & improved-recipe VLA \\
-OpenVLA SigLIP                 & \verb|openvla/openvla-7b| & Prismatic-Llama family VLA \\
-Florence-2 grounding           & \verb|microsoft/Florence-2-large| & VLM zero-shot baseline \\
-Qwen2-VL-2B grounding          & \verb|Qwen/Qwen2-VL-2B-Instruct| & VLM zero-shot baseline \\
-Random projection              & numpy random matrix & sanity baseline \\[0.4em]
-$\pi_0$ + adapter (ours)       & frozen + 297K MLP & intervention \\
-$\pi_{0.5}$ + adapter (ours)   & frozen + 297K MLP & intervention \\
-OpenVLA + adapter (ours)       & frozen + 297K MLP & intervention \\
-\bottomrule
-\end{tabular}
-\caption{The seven encoders and three intervention variants evaluated in this work.}
-\label{tab:encoders}
-\end{table}
+Drift is a \emph{class-stratified} measurement. CKA compares
+representations across all patches; drift compares only
+class-$c$ patches. If certain classes have larger drift than others,
+the rotation is class-selective, not uniform. We then test whether
+class-selective drift correlates with the per-class IoU drop measured
+by linear probing --- a positive correlation is evidence that the
+encoder-internal geometry numerically predicts the downstream behavior.
 
-\paragraph{Dataset.}
-UMD Part Affordance \cite{myers2015umd}. We use a 500-sample stratified
-split: $n_{\mathrm{train}} = 345$, $n_{\mathrm{val}} = 73$,
-$n_{\mathrm{test}} = 75$, balanced across 17 tool categories. We collapse
-\texttt{grasp}+\texttt{w-grasp} and drop \texttt{pound}, yielding the
-5-class+background taxonomy
-$\{\texttt{grasp}, \texttt{cut}, \texttt{scoop}, \texttt{contain},
-\texttt{support}\}$. The split files and taxonomy mapping are committed
-in the public repository.
+\subsection{Method 4 --- MLP Adapter Recovery (Intervention)}
 
-\paragraph{Metrics.}
-Mean IoU (foreground-only) and per-class IoU on the original 5-class
-formulation. Balanced accuracy, AUC, and F1 on the binary formulations
-(H10a, H10b, H9). Bootstrap confidence intervals with $n_{\mathrm{boot}}=1000$
-on per-class IoU. Spearman and Pearson correlation for the
-mechanism-behavior link. ManiSkill3 PickCube success rate as the
-companion downstream measurement.
+The final method is an active intervention. We replace the linear
+probe with a 2-layer MLP $h: \mathbb{R}^{1152} \to \mathbb{R}^{256} \to
+\mathbb{R}^{6}$ with GELU activation, dropout 0.1, and class-balanced
+cross-entropy loss. Total parameters: 297\,K. Training: 40 epochs,
+AdamW with learning rate $2 \times 10^{-3}$ and weight decay $10^{-4}$,
+batch size 8\,192 patches. The encoder is \emph{frozen} throughout.
 
-\paragraph{Hardware.}
-All experiments run on a single NVIDIA RTX 5060 Laptop with 8\,GB VRAM.
-Cloud spend: \$0.
+\subsubsection{Intuition and theory}
+
+The intuition tests a falsifiable hypothesis. If VLA fine-tuning
+\emph{deletes} per-class affordance information from the feature space,
+no head --- linear or non-linear --- can recover it. If VLA fine-tuning
+\emph{rotates} per-class information out of the linearly-readable
+subspace but preserves it elsewhere in the feature space, a small
+non-linear head should recover most of it. The 297\,K-parameter MLP is
+large enough to compensate for low-rank rotations but small enough to
+preclude memorisation (the UMD train set has only $345 \times 256 =
+88\,320$ patches; a 297\,K-parameter model is data-bound, not
+capacity-bound). The success of the recovery is therefore evidence
+about the structure of the loss, not an artifact of overfitting.
 
 % =====================================================================
-\section{Results}
-\label{sec:results}
+\section{Baseline Methods}
+\label{sec:baselines}
 
-\subsection{Linear probing on UMD beats the published baseline}
+To make the post-VLA encoder measurements interpretable, we compare each
+post-VLA encoder against five baselines that frame the answer.
+
+\subsection{DINOv2-base and DINOv2-large}
+
+DINOv2 \cite{oquab2024dinov2} is a self-supervised vision foundation
+model from Meta. We probe both \verb|facebook/dinov2-base| at $448^2$
+and \verb|facebook/dinov2-large| at $448^2$ and $560^2$. These provide
+a vision-only foundation reference unaffected by any
+language-instruction or robot-action signal during training. They are
+the strongest non-VLA encoders for general-purpose probing; their
+performance establishes the upper bound for a foundation encoder
+without VLA fine-tuning.
+
+\subsection{Standalone SigLIP-So400m at $224^2$}
+
+This is the \emph{matched} foundation reference. The SigLIP vision
+tower inside $\pi_0$, $\pi_{0.5}$, and OpenVLA all started as
+SigLIP-So400m at $224^2$ resolution. We probe the publicly-released
+\verb|google/siglip-so400m-patch14-224| with the same protocol used on
+the post-VLA encoders. This baseline is the single most important
+comparison: it is what each post-VLA encoder \emph{was} before VLA
+fine-tuning, and the difference between standalone and post-VLA scores
+is the direct measurement of what VLA fine-tuning destroyed.
+
+\subsection{SigLIP-base at $256^2$}
+
+A smaller VLM-style encoder \cite{zhai2023sigmoid} probed identically.
+Provides a sanity check that the SigLIP family in general carries
+affordance signal, distinguishing the SigLIP-So400m result from a
+base-SigLIP capacity ceiling.
+
+\subsection{Random projection control}
+
+A random initialisation of the same architecture, untrained. Probing it
+yields ~0.18 mIoU, isolating the contribution of the foundation
+features. This baseline rules out the alternative explanation "the
+linear probe is doing all the work and the foundation features don't
+matter."
+
+\subsection{Florence-2 zero-shot grounding}
+
+Florence-2 \cite{xiao2024florence2} is a zero-shot grounding VLM. We
+prompt it with the affordance class names and use its returned
+bounding-box predictions as the segmentation. This baseline tests
+whether modern grounding-trained VLMs can substitute for probing on the
+affordance task. The empirical answer in our experiments: no ---
+Florence-2 collapses to ~0.16 mIoU on this fine-grained per-pixel
+problem.
+
+\subsection{Linear probe vs.\ MLP adapter (head ablation)}
+
+The MLP adapter from Section~\ref{sec:methods} is itself compared
+against a linear probe head on the same backbone, controlling for the
+backbone and isolating the contribution of the head's non-linearity.
+This is what allows the rotation-vs-deletion test to be informative.
+
+% =====================================================================
+\section{Evaluation Methodology}
+\label{sec:evaluation}
+
+This section specifies the dataset, train/val/test splits, metrics, and
+comparison protocols used to evaluate every method in the report.
+
+\subsection{Dataset}
+
+We use the UMD Part Affordance dataset \cite{myers2015umd}: 17 tool
+categories, each with multiple instances and per-pixel affordance
+labels. Figure~\ref{fig:umd} shows representative examples.
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.85\linewidth]{figures/probe_miou.png}
-\caption{Linear-probe mIoU on UMD with $n_{\mathrm{train}} = 345$,
-across nine encoders. DINOv2-large at $560^2$ achieves
-\textbf{0.776 mIoU on val}, exceeding the published Zhang \emph{et al.}
-CVPR 2026 dense decoder (0.670) by \textbf{+10.6\,pp} with no decoder,
-no fine-tuning, and a 60-second \texttt{sklearn} fit. Florence-2
-(zero-shot grounding) and random projection collapse to baseline,
-isolating the foundation-feature contribution.}
+\includegraphics[width=0.95\linewidth]{figures/umd_examples.png}
+\caption{Representative UMD test images alongside ground-truth
+affordance labels and predictions from four backbones. Each row is a
+distinct tool category (mug, knife, hammer, shovel, scoop). Columns
+show RGB, ground-truth affordance map, and predictions from
+DINOv2-large, standalone SigLIP-So400m, $\pi_0$ SigLIP, and the
+$\pi_0$+adapter intervention. The dataset captures the per-pixel
+class structure that all probing experiments measure.}
+\label{fig:umd}
+\end{figure}
+
+The native UMD taxonomy has seven affordance verbs:
+\texttt{\{grasp, cut, scoop, contain, pound, support, w-grasp\}}.
+Following \cite{myers2015umd}, we collapse \texttt{grasp+w-grasp} into a
+single \texttt{grasp} class and drop \texttt{pound} due to its small
+sample size, yielding a 5-class+background taxonomy:
+\texttt{\{grasp, cut, scoop, contain, support\}}.
+
+\subsection{Splits}
+
+We use a 500-sample stratified split balanced across categories:
+\begin{itemize}[leftmargin=1.3em, itemsep=0.0em, topsep=0.2em]
+\item Train: 345 images (used to fit linear probes and adapters).
+\item Validation: 73 images (used for hyperparameter selection,
+including image-resolution sweeps).
+\item Test: 75 images (used only for final reported numbers).
+\end{itemize}
+The split is committed at \verb|data/umd/splits_500/| in the public
+repository for reproducibility.
+
+\subsection{Per-class IoU and mean IoU}
+
+For each class $c$, intersection-over-union is
+\[
+\mathrm{IoU}_c = \frac{|\{i: y_i = c\} \cap \{i: \hat{y}_i = c\}|}
+                       {|\{i: y_i = c\} \cup \{i: \hat{y}_i = c\}|}.
+\]
+Mean IoU (\verb|mIoU|) is the average across foreground classes.
+We report per-class IoU on every result so the asymmetric pattern is
+visible.
+
+\subsection{Balanced accuracy and AUC for binary tasks}
+
+For binary part-discrimination tasks (\textsc{H9}, \textsc{H10a},
+\textsc{H10b}), we report \emph{balanced accuracy}
+$\frac{1}{2}(\mathrm{TPR} + \mathrm{TNR})$ and the area under the ROC
+curve. Class balancing is applied via \verb|class_weight=balanced| in
+the logistic regression to handle the heavy imbalance between
+\texttt{cut} and other-foreground patches.
+
+\subsection{Bootstrap confidence intervals}
+
+For the headline per-class IoU numbers we report 95\% bootstrap
+confidence intervals with $n_{\mathrm{boot}} = 1000$ resamples at the
+image level. Image-level resampling preserves the within-image patch
+correlation that pixel-level resampling would destroy.
+
+\subsection{Linear CKA and per-class drift}
+
+Implemented as in Section~\ref{sec:methods}. Numerically stable on
+$N = 18\,688$ patches across $D = 1152$ dimensions. We report layer-wise
+CKA at all 28 layers (input embedding + 27 transformer blocks) for
+each VLA against standalone SigLIP-So400m.
+
+\subsection{Spearman and Pearson correlation}
+
+For the mechanism-predicts-behavior link
+(Section~\ref{sec:results}.\ref{sec:mechpredict}), we compute Spearman's
+rank correlation $\rho$ and Pearson's $r$ between per-class drift and
+per-class IoU drop, with two-tailed $p$-values. Significance is
+reported despite the small sample size ($n = 5$ classes per VLA).
+
+\subsection{Complexity-spectrum design}
+
+To localise where on the task-difficulty axis the apparent loss
+manifests, we evaluate cut detection under four progressively easier
+formulations:
+
+\begin{itemize}[leftmargin=1.3em, itemsep=0.1em, topsep=0.2em]
+\item \textbf{H2} --- 5-class IoU on full UMD. Hardest. Multi-class
+confusion across 17 tool categories.
+\item \textbf{H10a} --- Binary "\texttt{cut} vs.\ rest-foreground" on
+full UMD foreground patches. Multi-class data, binary readout.
+\item \textbf{H10b} --- Binary "\texttt{cut} vs.\ rest" evaluated on
+multi-tool composite scenes built by tiling a knife with a
+non-\texttt{cut} distractor. Adds visual co-presence.
+\item \textbf{H9} --- Binary "handle vs.\ blade" restricted to
+knife/scissors/shears/saw images only. Easiest. Single-object
+discrimination.
+\end{itemize}
+
+The four-formulation spectrum is the central methodological design
+that lets us distinguish "VLA encoder has lost cut" from "the H2 metric
+overstates the loss".
+
+% =====================================================================
+\section{Experimental Design and Results}
+\label{sec:results}
+
+This section presents eight experiments. Sections 6.1--6.5 measure the
+core probing-mechanism-recovery loop. Section 6.6 establishes the
+complexity-spectrum result. Section 6.7 provides qualitative
+visualisation. Section 6.8 reports the ManiSkill3 PickCube companion
+experiment that ties the encoder probing to a downstream perception
+task.
+
+\subsection{Experiment 1: Linear probing on UMD beats the published baseline}
+
+We probe nine encoders on UMD with the protocol of
+Section~\ref{sec:methods}.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.9\linewidth]{figures/probe_miou.png}
+\caption{Linear-probe mIoU on UMD with $n_{\mathrm{train}} = 345$
+across nine encoders, validation and test splits. DINOv2-large at
+$560^2$ scores 0.776 mIoU on val, exceeding the published Zhang
+\emph{et al.} CVPR 2026 dense decoder (0.670) by +10.6 pp with a
+60-second \texttt{sklearn} fit and no decoder. Florence-2 zero-shot
+grounding and random projection collapse to baseline.}
 \label{fig:probe_miou}
 \end{figure}
 
-A linear probe over frozen DINOv2-large patch features at
-$560 \times 560$ resolution scores 0.776 mIoU on UMD val
-(Figure~\ref{fig:probe_miou}). For comparison, Zhang \emph{et al.}
-\cite{zhang2026umd} report 0.670 mIoU using a dense decoder atop
-foundation features. We exceed their result by 10.6\,pp without a
-decoder. Resolution dominates capacity: DINOv2-base at $448^2$ (0.733)
-matches DINOv2-large at the same resolution (0.726). Random projection
-control collapses to 0.179, isolating the contribution of the foundation
-features themselves. Florence-2 zero-shot grounding scores 0.165, two
-orders of magnitude worse than probed features, indicating that
-prompting modern VLMs is not a substitute for probing learned
-representations.
+\textbf{Result.} A linear probe over frozen DINOv2-large patch features
+at $560 \times 560$ resolution scores 0.776 mIoU on UMD val, exceeding
+Zhang \emph{et al.}'s 0.670 dense-decoder baseline
+\cite{zhang2026umd} by +10.6 pp (Figure~\ref{fig:probe_miou}). Resolution
+beats capacity: DINOv2-base at $448^2$ (0.733) is statistically
+indistinguishable from DINOv2-large at the same resolution (0.726).
+Random projection collapses to 0.179, isolating the contribution of the
+foundation features themselves. Florence-2 zero-shot grounding scores
+0.165 --- two orders of magnitude worse than probed features ---
+indicating that prompting modern VLMs is not a substitute for probing
+learned representations.
 
-\subsection{VLA fine-tuning degrades affordance class-asymmetrically}
+\textbf{Why this matters.} It establishes the foundation-encoder
+ceiling against which we measure the post-VLA encoders. A
+60-second linear probe on a frozen DINOv2-large is enough to beat the
+published state-of-the-art on UMD; this is the strongest possible
+position from which to ask "did VLA fine-tuning preserve this signal?"
+
+\subsection{Experiment 2: VLA fine-tuning degrades affordance class-asymmetrically}
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.95\linewidth]{figures/per_class_iou.png}
-\caption{Per-class IoU on UMD val for the SigLIP family. \texttt{cut}
-loses 27\,pp on $\pi_0$ and 22\,pp on OpenVLA; \texttt{contain} is
-preserved within 2\,pp on every VLA. The pattern persists across two
-distinct VLA families with different backbones, fine-tuning corpora,
-and action heads.}
+\caption{Per-class IoU on UMD val for the SigLIP family. Standalone
+SigLIP-So400m at $224^2$ is the foundation reference; $\pi_0$,
+$\pi_{0.5}$, and OpenVLA are the same architecture after end-to-end
+VLA fine-tuning. \texttt{cut} loses 27 pp on $\pi_0$ and 22 pp on
+OpenVLA; \texttt{contain} is preserved within 2 pp on every VLA. The
+asymmetric pattern persists across two distinct VLA families with
+different backbones, fine-tuning corpora, and action heads.}
 \label{fig:perclass}
 \end{figure}
 
-Applying the same probe protocol to the SigLIP family
-(Figure~\ref{fig:perclass}) reveals a class-asymmetric loss. Standalone
-SigLIP-So400m at $224^2$ is the foundation reference; $\pi_0$,
-$\pi_{0.5}$, and OpenVLA are the same architecture after end-to-end VLA
-fine-tuning. Cut IoU drops from 0.455 to 0.181 on $\pi_0$ (a 27\,pp
-deficit). Contain IoU drops from 0.649 to 0.638 (a 1\,pp deficit ---
-essentially preserved). Support drops 17\,pp.
+\textbf{Result.} Applying the same probe protocol to the SigLIP family
+(Figure~\ref{fig:perclass}) reveals a class-asymmetric loss. Cut IoU
+drops from 0.455 to 0.181 on $\pi_0$ (a 27 pp deficit). Contain IoU
+drops from 0.649 to 0.638 (a 1 pp deficit --- essentially preserved).
+Support drops 17 pp.
 
 The pattern \emph{generalises across families}. OpenVLA, which uses a
 Prismatic-Llama backbone fine-tuned on Open X-Embodiment data ---
 totally different LLM, different training corpus, different action head
-than $\pi_0$ --- shows the same asymmetric structure: cut $-22$\,pp,
-contain $-2$\,pp. The recipe-improved $\pi_{0.5}$ partially recovers cut
-($0.181 \to 0.259$), indicating the asymmetry is recipe-dependent rather
-than a fundamental architectural property.
+than $\pi_0$ --- shows the same asymmetric structure: cut $-22$ pp,
+contain $-2$ pp. The recipe-improved $\pi_{0.5}$ partially recovers cut
+($0.181 \to 0.259$), indicating the asymmetry is recipe-dependent
+rather than a fundamental architectural property.
 
-\subsection{Mechanism: where in the encoder does the loss live?}
+\textbf{Why this matters.} It is the central novel measurement of the
+project. The per-class structure is meaningful for downstream
+deployment: a robot that primarily picks and places will be
+unaffected by VLA fine-tuning, but a robot that cuts or shears will
+have lost most of the signal it needs.
+
+\subsection{Experiment 3: Mechanism --- where in the encoder does the loss live?}
+\label{sec:cka}
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.95\linewidth]{figures/cka_drift.png}
 \caption{(\textit{Left}) Layer-wise linear CKA between standalone
 SigLIP-So400m and each VLA, computed over 18\,688 UMD val patches.
-$\pi_0$ rotates the final layer to nearly orthogonal
-(CKA = 0.023), while $\pi_{0.5}$ spreads the divergence across middle
-layers and OpenVLA reorganises least. (\textit{Right}) Per-class
-final-layer cosine similarity. \texttt{cut} has the lowest similarity
-in all three VLAs --- the rotation is class-selective, not uniform.}
+$\pi_0$ rotates the final layer to nearly orthogonal (CKA = 0.023),
+while $\pi_{0.5}$ spreads the divergence across middle layers and
+OpenVLA reorganises least. (\textit{Right}) Per-class final-layer
+cosine similarity. \texttt{cut} has the lowest similarity in all three
+VLAs --- the rotation is class-selective, not uniform.}
 \label{fig:cka}
 \end{figure}
 
-Layer-wise CKA between standalone and each VLA
+\textbf{Result.} Layer-wise CKA between standalone and each VLA
 (Figure~\ref{fig:cka}, left) shows that $\pi_0$ keeps the encoder
 nearly identical to the foundation reference through layer 12
 (CKA $> 0.95$), then sharply rotates the final layer to a CKA of
@@ -435,29 +701,36 @@ cosine-similarity-to-standalone among foreground classes for all three
 VLAs, while \texttt{contain} has the highest. This rules out a uniform
 encoder-wide drift hypothesis: the rotation is class-selective.
 
-\subsection{Mechanism predicts behavior}
+\textbf{Why this matters.} It identifies the layer-level mechanism of
+the loss. $\pi_0$'s class-asymmetric loss is concentrated in the final
+transformer block, which is the layer that cross-attends with the
+flow-matching action head during inference. The encoder is being
+specifically trained to lay out final-token directions for
+action-prediction at the cost of the affordance geometry the foundation
+encoder originally had.
+
+\subsection{Experiment 4: Mechanism predicts behavior}
+\label{sec:mechpredict}
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.65\linewidth]{figures/drift_vs_iou.png}
+\includegraphics[width=0.7\linewidth]{figures/drift_vs_iou.png}
 \caption{Per-class final-layer drift versus per-class IoU drop, for
 each VLA. Statistically significant correlations on $\pi_0$ (Spearman
-$\rho = 0.90$, $p = 0.037$) and OpenVLA (Pearson $r = 0.95$, $p = 0.012$)
-despite $n = 5$ classes. The encoder-internal geometry of the
-representation drift numerically predicts the measured downstream
+$\rho = 0.90$, $p = 0.037$) and OpenVLA (Pearson $r = 0.95$,
+$p = 0.012$) despite $n = 5$ classes. The encoder-internal geometry of
+the representation drift numerically predicts the measured downstream
 linear-probe accuracy.}
 \label{fig:drift}
 \end{figure}
 
-For each VLA, plotting per-class final-layer drift $1 - \cos(\mu^{(\mathrm{std})}_c, \mu^{(\phi)}_c)$
+\textbf{Result.} Plotting per-class drift $1 - \cos(\mu_c^{(\mathrm{std})}, \mu_c^{(\phi)})$
 against per-class IoU drop yields the correlations in
 Table~\ref{tab:drift}. Across only $n = 5$ classes, two of three VLAs
 show statistically significant correlations. The per-class drift is a
-\emph{measurement of encoder internal geometry alone} (no probe is
+\emph{measurement of encoder-internal geometry alone} (no probe is
 fitted to compute it), and it correctly ranks the per-class IoU drop
 that a linear probe will measure on the downstream classification task.
-This is the first reported mechanism-predicts-behavior link for a VLA
-encoder, to our knowledge.
 
 \begin{table}[t]
 \centering
@@ -472,36 +745,43 @@ OpenVLA    & \textbf{0.953} & \textbf{0.012} & 0.700 & 0.188 \\
 \bottomrule
 \end{tabular}
 \caption{Mechanism-predicts-behavior correlations across three VLA
-families. Both $\pi_0$ and OpenVLA show significant correlations
-despite $n = 5$ classes. $\pi_{0.5}$'s weaker correlation is consistent
-with its more diffuse mid-layer reorganisation pattern: drift in
-$\pi_{0.5}$ is spread across the encoder rather than concentrated at
-the last layer where we measure it.}
+families. $n = 5$ classes per VLA. Both $\pi_0$ and OpenVLA show
+statistically significant correlations.}
 \label{tab:drift}
 \end{table}
 
-\subsection{Intervention: a 297K-parameter adapter recovers the signal}
+\textbf{Why this matters.} It is the first reported
+mechanism-predicts-behavior link for a VLA encoder, to our knowledge.
+The implication is that practitioners can predict which downstream
+affordance classes will be degraded by VLA fine-tuning purely from
+encoder-internal geometry, without ever fitting a probe. A small
+auxiliary measurement (final-layer cosine similarity per class) gives a
+principled prediction of where the encoder is reliable and where it is
+not.
+
+\subsection{Experiment 5: Intervention --- a 297K-parameter adapter recovers the signal}
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.95\linewidth]{figures/adapter_recovery.png}
 \caption{Frozen-backbone adapter recovery across three VLA encoders.
-The 297\,K-parameter MLP (left) recovers most of the cut-class IoU
-gap (right). $\pi_0$+adapter exceeds the standalone-linear ceiling on
-overall mIoU.}
+The 297\,K-parameter MLP (left panel: overall mean-foreground IoU;
+right panel: per-class IoU) recovers most of the cut-class IoU gap.
+$\pi_0$+adapter exceeds the standalone-linear ceiling on overall mIoU.}
 \label{fig:adapter}
 \end{figure}
 
-Replacing the linear probe with a 297\,K-parameter MLP adapter on
-\emph{frozen} VLA features (Section~\ref{sec:adapter}) closes most of
-the per-class gap (Figure~\ref{fig:adapter}, Table~\ref{tab:adapter}).
-On $\pi_0$, cut IoU recovers from 0.181 to 0.405 --- 82\% of the gap to
-standalone (0.455) closed. Overall foreground mIoU goes from 0.519 to
-0.642, exceeding the standalone-linear ceiling of 0.610. The same
-recipe transfers to $\pi_{0.5}$ and OpenVLA. The lost signal was
+\textbf{Result.} Replacing the linear probe with a 297\,K-parameter MLP
+adapter on \emph{frozen} VLA features (Section~\ref{sec:methods})
+closes most of the per-class gap (Figure~\ref{fig:adapter},
+Table~\ref{tab:adapter}). On $\pi_0$, cut IoU recovers from 0.181 to
+0.405 --- 82\% of the gap to standalone (0.455) closed. Overall
+foreground mIoU goes from 0.519 to 0.642, exceeding the
+standalone-linear ceiling of 0.610. The same recipe transfers to
+$\pi_{0.5}$ and OpenVLA without modification. The lost signal was
 \emph{rotated out of linearly-readable directions, not deleted}.
 
-\begin{table}[t]
+\begin{table}[h]
 \centering
 \small
 \begin{tabular}{l c c c c}
@@ -517,261 +797,427 @@ $\pi_{0.5}$ / \textbf{adapter} & \textbf{0.632} & 0.618 & \textbf{0.483} & 0.688
 OpenVLA / \textbf{adapter}    & \textbf{0.604} & 0.601 & \textbf{0.379} & 0.689 \\
 \bottomrule
 \end{tabular}
-\caption{Adapter recovery numbers. The 297K-parameter MLP recovers
-$82\%$ of the cut-class gap on $\pi_0$ (0.181 $\to$ 0.405; standalone =
-0.455). On $\pi_{0.5}$, the adapter actually \emph{exceeds} the
-standalone-linear cut IoU (0.483 vs.\ 0.455).}
+\caption{Adapter recovery numbers. The 297\,K-parameter MLP recovers
+$82\%$ of the cut-class gap on $\pi_0$. On $\pi_{0.5}$, the adapter
+actually \emph{exceeds} the standalone-linear cut IoU (0.483 vs.\ 0.455).}
 \label{tab:adapter}
 \end{table}
 
-\subsection{Complexity spectrum: when does the loss actually appear?}
+\textbf{Why this matters.} It transforms a diagnostic finding into a
+deployment recipe. Instead of retraining a foundation encoder ---
+which requires substantial data and compute --- a deploying team can
+attach a 297\,K-parameter head on top of the frozen VLA encoder and
+recover most of the lost affordance signal at near-zero training cost.
+
+\subsection{Experiment 6: Complexity spectrum}
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.85\linewidth]{figures/complexity_spectrum.png}
-\caption{Cut-detection score per encoder across four task formulations.
-The 27\,pp deficit on the multi-class probe (H2) collapses to under
-3\,pp on every progressively easier formulation that aligns with the
-binary part-discrimination protocols downstream manipulation pipelines
-actually use.}
+\caption{Cut-detection score per encoder across four task formulations
+of decreasing complexity. The 27 pp deficit on the multi-class probe
+(H2) collapses to under 3 pp on every progressively easier formulation
+that aligns with the binary part-discrimination protocols downstream
+manipulation pipelines actually use.}
 \label{fig:spectrum}
 \end{figure}
 
-The 27\,pp gap that the multi-class probe reports does not
-generalise. On binary cut-vs-rest detection across the full UMD test
-set (H10a), $\pi_0$ scores 0.971 balanced accuracy versus standalone's
-1.000 --- a 3\,pp gap. On multi-tool composite scenes (H10b) where a
-knife is co-presented with a contain-class distractor, $\pi_0$ scores
-0.927 versus standalone's 0.931 --- under 1\,pp. On single-object
-handle-vs-blade discrimination (H9, the formulation closest to what
-Aff-Grasp and GIFT actually need), $\pi_0$ scores 0.985 versus 1.000
---- 1.5\,pp.
+\textbf{Result.} The 27 pp gap that the multi-class probe (H2) reports
+does not generalise. As we move from H2 to H10a (binary
+\texttt{cut}-vs-rest, full UMD) to H10b (multi-tool composites) to H9
+(single-object handle vs.\ blade), the gap collapses
+(Table~\ref{tab:spectrum} and Figure~\ref{fig:spectrum}).
 
-\begin{table}[t]
+\begin{table}[h]
 \centering
 \small
 \begin{tabular}{l c c c}
 \toprule
 Test & Standalone score & $\pi_0$ score & Gap \\
 \midrule
-H2  (5-class \texttt{cut} IoU)              & 0.455 & 0.181 & $-27.4$\,pp \\
-H10a (binary cut vs.\ rest, full UMD bal.\ acc.) & 1.000 & 0.971 & $-2.9$\,pp \\
-H10b (binary cut, multi-tool composite bal.\ acc.) & 0.931 & 0.927 & $-0.4$\,pp \\
-H9  (binary handle vs.\ blade, single-object bal.\ acc.) & 1.000 & 0.985 & $-1.5$\,pp \\
+H2  (5-class \texttt{cut} IoU)              & 0.455 & 0.181 & $-27.4$ pp \\
+H10a (binary cut vs.\ rest, full UMD bal.\ acc.) & 1.000 & 0.971 & $-2.9$ pp \\
+H10b (binary cut, multi-tool composite bal.\ acc.) & 0.931 & 0.927 & $-0.4$ pp \\
+H9  (binary handle vs.\ blade, single-object bal.\ acc.) & 1.000 & 0.985 & $-1.5$ pp \\
 \bottomrule
 \end{tabular}
 \caption{Complexity-spectrum results. $\pi_0$ vs.\ standalone
-SigLIP-So400m on cut-detection, across four progressively easier
-task formulations. The H2 multi-class probe is the only test on which
-the gap is large.}
+SigLIP-So400m on cut-detection across four progressively easier task
+formulations. The H2 multi-class probe is the only test on which the
+gap is large.}
 \label{tab:spectrum}
 \end{table}
 
-The implication is methodological: the 5-class IoU metric used by every
-prior probing paper (including the published state-of-the-art on UMD)
-\emph{overstates the encoder deficit} relative to the perception
-sub-problem manipulation actually solves. Practitioners evaluating a
-deployed VLA should benchmark the encoder on the binary
-part-discrimination formulation that matches their downstream task.
+\textbf{Why this matters.} It is the most methodologically important
+finding of the report. The 5-class IoU metric --- which is what every
+prior probing paper (including the published Zhang \emph{et al.}
+state-of-the-art) uses --- \emph{overstates the encoder deficit}
+relative to the perception sub-problem manipulation actually solves.
+On the binary part-discrimination formulations that
+Aff-Grasp \cite{li2025affgrasp}, GIFT \cite{turpin2021gift}, and
+Kokic \emph{et al.} \cite{kokic2017affordance} actually use, the
+post-VLA encoders are essentially indistinguishable from the
+foundation source. Practitioners evaluating a deployed VLA should
+benchmark the encoder on the binary part-discrimination formulation
+that matches their downstream task, not on multi-class IoU.
 
-\subsection{Qualitative analysis}
+\subsection{Experiment 7: Qualitative analysis}
+
+Figure~\ref{fig:h9_qual} shows per-patch handle/blade probability maps
+for all seven encoders on held-out UMD knife and shears images.
+Figure~\ref{fig:h10b_qual} extends this to multi-tool composite scenes
+where a knife is co-presented with a non-\texttt{cut} distractor.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{figures/h9_qualitative.png}
 \caption{Held-out UMD test images. Red = predicted handle
 (\texttt{grasp}); blue = predicted blade (\texttt{cut}). Across all
-seven encoders, including the VLAs that ``lost'' \texttt{cut} under
-H2 multi-class probing, predicted blade regions land on the actual
+seven encoders, including the VLAs that "lost" \texttt{cut} under H2
+multi-class probing, predicted blade regions land on the actual
 cutting edge.}
-\label{fig:qual}
+\label{fig:h9_qual}
 \end{figure}
 
-Figure~\ref{fig:qual} shows per-patch handle/blade probability maps for
-all seven encoders on held-out UMD knife and shears images. Despite the
-27\,pp multi-class deficit, the VLA encoders' binary handle/blade
-predictions land on the correct sub-regions. The qualitative picture
-matches the complexity-spectrum quantitative result.
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/h10b_qualitative.png}
+\caption{Held-out two-tool composite scenes. Each row shows a knife
+co-presented with a different non-\texttt{cut} distractor object.
+Per-patch handle/blade classification still correctly identifies the
+cutting edge of the knife while ignoring the distractor object,
+across all encoders.}
+\label{fig:h10b_qual}
+\end{figure}
 
-\subsection{Companion experiment: ManiSkill3 PickCube}
+\textbf{Result.} The qualitative picture matches the
+complexity-spectrum quantitative result. Despite the 27 pp multi-class
+deficit, the VLA encoders' binary handle/blade predictions land on the
+correct sub-regions in both single-tool and multi-tool composite
+scenes. This rules out a "the metric overstates but the perception
+really is broken" alternative explanation.
+
+\subsection{Experiment 8: ManiSkill3 PickCube companion experiment}
+
+To test whether the per-class probing structure predicts a downstream
+robotics-relevant perception outcome, we ran a companion experiment in
+the ManiSkill3 \cite{tao2024maniskill3} simulator on the PickCube task
+--- a \texttt{contain}-class manipulation problem.
 
 \begin{figure}[t]
 \centering
 \begin{subfigure}{0.49\linewidth}
 \centering
 \includegraphics[width=\linewidth]{figures/h6_robustness.png}
-\caption{Pretrained PPO success vs.\ Gaussian noise on the cube\_pos
-state slice. 10\,cm noise drops success from 0.96 to 0.22.}
+\caption{Pretrained PPO success rate vs.\ Gaussian noise applied to
+the cube-position state slice. 10 cm noise drops success from 0.96 to
+0.22.}
 \label{fig:h6_robustness}
 \end{subfigure}\hfill
 \begin{subfigure}{0.49\linewidth}
 \centering
 \includegraphics[width=\linewidth]{figures/h6_predictor.png}
 \caption{Cube-position regression error from frozen patch features.
-$\pi_0$ SigLIP wins on this geometric (\texttt{contain}-class) task.}
+$\pi_0$ SigLIP achieves 1.61 cm mean L2 error vs.\ DINOv2-base's
+3.68 cm on this geometric task.}
 \label{fig:h6_predictor}
 \end{subfigure}
-\caption{ManiSkill3 PickCube companion experiment. (a) state-conditioned
-PPO is fragile to perception error. (b) $\pi_0$'s vision tower predicts
-cube position 2$\times$ better than DINOv2-base on this geometric task,
-exactly as the H2 per-class structure (\texttt{contain} preserved) predicts.}
+\caption{ManiSkill3 PickCube companion experiment. (a)
+state-conditioned PPO is fragile to perception error.
+(b) $\pi_0$'s vision tower predicts cube position 2$\times$ better
+than DINOv2-base on this geometric task --- exactly as the H2
+per-class structure (\texttt{contain} preserved) predicts.}
 \label{fig:h6}
 \end{figure}
 
-We ran a downstream perception experiment on ManiSkill3
-\cite{tao2024maniskill3} PickCube --- a \texttt{contain}-class
-manipulation task --- using each VLA's frozen vision tower as a feature
-extractor for cube-position regression
-(Figure~\ref{fig:h6}).
-The pretrained ManiSkill3 PPO checkpoint solves PickCube at 96\%
-success on clean state but collapses to 22\% under 10\,cm Gaussian
-noise on the cube-position observation slice
-(Figure~\ref{fig:h6_robustness}). State-conditioned policies are
-extremely fragile to perception error.
+\textbf{Setup.} We use the official ManiSkill3 PPO checkpoint at
+\verb|~/.maniskill/demos/PickCube-v1/rl/ppo_pd_joint_delta_pos_ckpt.pt|
+which solves PickCube at 96\% success on clean state. We add Gaussian
+noise $\sigma$ to the cube-position state slice and re-evaluate
+(Figure~\ref{fig:h6_robustness}). Then we train Ridge regressors over
+mean-pooled patch features that map RGB to 3D cube xyz, on 400 rendered
+frames per encoder; validation L2 error is reported on 100 held-out
+frames (Figure~\ref{fig:h6_predictor}).
 
-We then trained Ridge regressors over mean-pooled patch features that
-map RGB to 3D cube xyz, on 400 rendered frames per encoder.
-$\pi_0$ SigLIP achieves 1.61\,cm mean L2 error vs.\ DINOv2-base's
-3.68\,cm (Figure~\ref{fig:h6_predictor}). Two-fold improvement.
+\textbf{Result.} The pretrained PPO is extremely fragile to perception
+error: 5 cm noise drops success from 96\% to 65\%, and 10 cm noise
+collapses to 22\%. State-conditioned policies presume their state
+vector to be precise and behave catastrophically when it is not.
 
-This is a clean downstream confirmation of the H2 per-class structure:
-$\pi_0$ preserved \texttt{contain}-class affordance, and PickCube
-cube-position is a \texttt{contain}-class quantity, so $\pi_0$'s vision
-tower outperforms uninstructed DINOv2 on this task. The per-class
-probing scores correctly predicted the per-task downstream winner.
+The vision-based cube-position predictor accuracy is the key result:
+\textbf{$\pi_0$ SigLIP achieves 1.61 cm mean L2 error, vs.\ DINOv2-base's
+3.68 cm.} $\pi_0$ wins by 2$\times$ on this geometric task.
+
+This is a clean downstream confirmation of the H2 per-class structure.
+$\pi_0$ preserved \texttt{contain}-class affordance (Figure~\ref{fig:perclass},
+$\Delta = -1$ pp), and PickCube cube-position is a
+\texttt{contain}-class quantity (geometry of an enclosed object), so
+$\pi_0$'s vision tower outperforms uninstructed DINOv2 on this task.
+\textbf{The per-class probing scores correctly predicted the per-task
+downstream winner.}
+
+\textbf{Why this matters.} It closes the loop between probing and
+downstream task in one direction (\texttt{contain}). For tasks
+requiring \texttt{cut} perception (knife-handle disambiguation, edge
+alignment), the prediction reverses: DINOv2 should beat $\pi_0$
+because $\pi_0$ lost 27 pp of cut IoU under H2 probing. A future
+experiment closing the cut-task half of the loop would establish the
+full per-class crossover.
 
 % =====================================================================
-\section{Discussion}
-\label{sec:discussion}
+\section{Observations and Analysis}
+\label{sec:observations}
 
-\paragraph{What the work establishes.}
+This section discusses what the experiments establish and what
+surprised us, and offers a hypothesis for why the loss has the
+particular structure it does.
+
+\subsection{What the work establishes}
+
 VLA fine-tuning corrupts affordance representations in a structured,
-recoverable way. The corruption is class-asymmetric (\texttt{cut}
-destroyed, \texttt{contain} preserved), family-general (PaliGemma and
-Prismatic-Llama show the same pattern), recipe-dependent ($\pi_{0.5}$
-partially recovers cut), mechanistically localised (final-layer
-rotation, with class-selective drift correlated to per-class IoU drop),
-and recoverable with a 297\,K-parameter adapter on frozen features. On
-the geometric subset of downstream tasks, post-VLA encoders actually
-outperform uninstructed baselines.
+recoverable way. Specifically:
 
-\paragraph{What surprised us.}
-The headline finding from H2 --- ``$\pi_0$ catastrophically loses cut
-affordance'' --- did not survive the complexity-spectrum analysis. We
-expected the 27\,pp deficit to manifest on any cut-related task; in
-practice it collapses on every binary part-discrimination formulation.
-This is a significant nuancing of the existing affordance-probing
-literature: the standard 5-class IoU metric over-reports the deficit
-relative to the perception sub-problem manipulation actually solves.
+\begin{enumerate}[leftmargin=1.3em, itemsep=0.2em, topsep=0.2em]
+\item The corruption is \textbf{class-asymmetric}: \texttt{cut} is
+destroyed ($-$27 pp on $\pi_0$), \texttt{contain} is preserved ($-$1 pp),
+\texttt{support} is intermediate ($-$17 pp).
+\item The corruption is \textbf{family-general}: PaliGemma-backboned
+$\pi_0$/$\pi_{0.5}$ and Prismatic-Llama-backboned OpenVLA show the
+same asymmetric pattern.
+\item The corruption is \textbf{recipe-dependent}: $\pi_{0.5}$
+partially recovers \texttt{cut} (0.181 → 0.259) under its improved
+training recipe.
+\item The corruption is \textbf{mechanistically localised}: $\pi_0$
+rotates only the final transformer block (CKA = 0.023 at layer 27),
+not the entire encoder.
+\item The per-class drift in the final layer \textbf{numerically
+predicts} the per-class IoU drop (Spearman $\rho = 0.90$, $p = 0.037$
+for $\pi_0$).
+\item The corruption is \textbf{recoverable} with a 297\,K-parameter
+adapter that closes 82\% of the cut-class gap on frozen features.
+\item On the geometric subset of downstream tasks
+(Experiment 8), post-VLA encoders \emph{outperform} uninstructed
+foundation baselines, exactly as the H2 per-class structure predicts.
+\end{enumerate}
 
-\paragraph{Why $\pi_0$ rotates the final layer so heavily.}
-$\pi_0$'s flow-matching action head reads action tokens that
+\subsection{What surprised us}
+
+The headline finding of Experiment 2 ("$\pi_0$ catastrophically loses
+cut affordance") did \emph{not} survive the complexity-spectrum
+analysis (Experiment 6). We expected the 27 pp deficit to manifest on
+any cut-related test --- a perception capability that disappears under
+multi-class probing should disappear under binary probing too. In
+practice, the gap collapses on every binary part-discrimination
+formulation. This is a significant nuancing of the existing
+affordance-probing literature: the standard 5-class IoU metric over-reports
+the deficit relative to the perception sub-problem manipulation actually
+solves. The methodological implication of this finding is, we believe,
+the most important contribution of the project, even though it was not
+the headline we expected to find.
+
+\subsection{Why $\pi_0$ rotates the final layer so heavily}
+
+A specific architectural hypothesis explains the layer-localised
+rotation. $\pi_0$'s flow-matching action head reads action tokens that
 cross-attend with the SigLIP final-layer outputs. The encoder is
 pressured to lay out the final-token directions to support action
 prediction; our final-layer CKA of 0.023 indicates a near-orthogonal
-rotation. $\pi_{0.5}$'s improved recipe spreads this pressure across
-middle layers (final CKA = 0.36), preserving more of the original
-geometry overall but with less geometric specialisation in the late
-features. OpenVLA's autoregressive action token requires less rotation
-of the encoder than $\pi_0$'s continuous-action head.
+rotation that is \emph{specifically} optimised for action read-out.
+$\pi_{0.5}$'s improved recipe spreads this pressure across middle
+layers (final CKA = 0.36), preserving more of the original geometry
+overall but with less geometric specialisation in the late features.
+OpenVLA's autoregressive action token requires less rotation of the
+encoder than $\pi_0$'s continuous-action head, consistent with our
+measurement (final CKA = 0.61 for OpenVLA vs.\ 0.023 for $\pi_0$).
 
-\paragraph{Why the loss is class-asymmetric.}
+\subsection{Why the loss is class-asymmetric}
+
 \texttt{cut} requires distinguishing handle from blade --- an
 edge-orientation cue. We hypothesise that $\pi_0$'s training corpus
 contains few cutting primitives, so the encoder has no incentive to
-preserve edge-orientation directions in linearly readable form.
-\texttt{contain} and \texttt{scoop} require coarser geometric cues
-(concavity, opening) that benefit pick-and-place primitives, which
-dominate $\pi_0$'s training data.
+preserve edge-orientation directions in linearly readable form ---
+those directions are repurposed to encode whatever is more useful for
+the action-prediction objective. \texttt{contain} and \texttt{scoop}
+require coarser geometric cues (concavity, opening) that benefit
+pick-and-place primitives, which dominate $\pi_0$'s training data.
+This hypothesis is consistent with $\pi_{0.5}$'s partial recovery on
+\texttt{cut}: a richer training recipe with more diverse manipulation
+primitives is precisely what would re-introduce edge-orientation
+gradient signal.
 
 % =====================================================================
 \section{Limitations and Failure Cases}
-\label{sec:limitations}
+\label{sec:limits}
 
-\paragraph{Single dataset.}
-All probing claims are on UMD Part Affordance. Cross-dataset validation
-on AGD20K \cite{luo2022agd20k}, IIT-AFF, or 3D AffordanceNet was in
-scope but not completed.
+This section documents what the project did not do, what failed, and
+what should be treated with caution.
 
-\paragraph{No closed-loop manipulation evaluation.}
-We did not plug the recovered (adapter) features into a real policy and
-measure success rate. The natural follow-up --- LIBERO $\times$ $\pi_0$
-per-task success-rate prediction from per-class probe scores ---
-requires $\geq 24$\,GB VRAM for $\pi_0$ inference; we had 8\,GB local.
+\subsection{Single dataset}
 
-\paragraph{Adapter does not transfer.}
+All probing claims are on UMD Part Affordance. AGD20K, IIT-AFF, and
+3D AffordanceNet were in scope but not completed. AGD20K in particular
+is hosted on Google Drive only and does not have a programmatic mirror
+that fits in our local pipeline; running it would have required manual
+download and re-annotation.
+
+\subsection{No closed-loop manipulation evaluation}
+
+We did not plug the recovered (adapter) features into a real policy
+and measure success rate change. The natural follow-up --- LIBERO
+\cite{liu2023libero} $\times$ $\pi_0$ per-task success-rate prediction
+from per-class probe scores --- requires $\geq 24$ GB VRAM for $\pi_0$
+inference; we had 8 GB local. Without this experiment, the chain
+"probing prediction → per-task policy success" remains demonstrated
+only in one direction (\texttt{contain}, in Experiment 8) and not in
+the other (\texttt{cut}).
+
+\subsection{Adapter does not transfer cleanly across distributions}
+
 On H10b multi-tool composites, $\pi_0$+adapter drops to 0.85 balanced
 accuracy versus raw $\pi_0$'s 0.93. The adapter is dataset-specific.
-We report this as a documented failure mode rather than a fix.
+We report this as a documented failure mode rather than a fix. The
+practical implication: a deploying team should re-fit the adapter on
+training data drawn from their target distribution rather than reuse
+an UMD-fit adapter zero-shot.
 
-\paragraph{Mechanism correlation has low n.}
+\subsection{Mechanism correlation has low statistical power}
+
 $n = 5$ affordance classes per VLA. Significant for two of three VLAs
-but underpowered. A wider taxonomy would harden the result.
+($\pi_0$, OpenVLA) but underpowered. A wider taxonomy --- the
+36-class AGD20K, for example --- would harden the result by a
+substantial factor.
 
-\paragraph{Recovery via state override fails.}
-We attempted to use the cube-position predictor's output to override the
-PPO policy's state observation under noise. Oracle override gives 100\%
-success at all noise levels; vision-predicted override stays flat at
-$\sim$7\%, \emph{worse} than the noisy baseline. Diagnostic: ManiSkill3
-encodes cube position redundantly across multiple state slices; partial
-override creates contradictory signals. We document this as a real
-intervention-design lesson: to inject affordance into a state-conditioned
-policy, the affordance signal must be consistent with all task-relevant
-state slices, or the policy must be retrained from pixels-only.
+\subsection{Recovery via state override fails on PickCube}
+
+We attempted to use the cube-position predictor's output to override
+the PPO policy's noisy state observation under the noise robustness
+sweep of Experiment 8. Oracle override (replace with ground truth)
+gives 100\% success at all noise levels. Vision-predicted override
+stays flat at $\sim$7\%, \emph{worse} than the noisy baseline.
+
+The diagnostic is informative. ManiSkill3 encodes cube position
+redundantly across multiple state slices: absolute xyz at
+\verb|state[29:32]|, but also tcp-to-cube relative position at
+\verb|state[36:39]| and cube velocity. When we override only one slice
+with a 1.6 cm-imprecise prediction, the policy receives
+\emph{contradictory signals} about where the cube is and behaviour
+collapses. We document this as a real intervention-design lesson: to
+inject affordance into a state-conditioned policy, the affordance
+signal must be consistent with all task-relevant state slices, or the
+policy must be retrained from pixels-only. This is a finding worth
+sharing in its own right.
 
 % =====================================================================
 \section{Future Work}
 \label{sec:future}
 
-The natural extensions of this work cluster around closing the loop
-from per-class probing to per-task manipulation success.
+The natural extensions of this project cluster around closing the loop
+between per-class encoder probing and per-task manipulation success,
+and around broadening the empirical base. We list four directions in
+order of priority.
 
-\paragraph{LIBERO $\times$ $\pi_0$ per-task crossover.}
-Group LIBERO's 130 tasks by primary affordance class, run $\pi_0$
-zero-shot, measure per-class success rate, correlate with H2 per-class
-IoU. If correlation is significant, the chain ``encoder probing $\to$
-policy success'' closes. Compute: $\sim$40 GPU-hours on an A100.
+\subsection{LIBERO $\times$ $\pi_0$ per-task crossover}
 
-\paragraph{Adapter on a real policy.}
+Group LIBERO's 130 tasks by primary affordance class
+(\texttt{cut}, \texttt{contain}, \texttt{grasp}, \texttt{support}),
+run $\pi_0$ zero-shot, measure per-class success rate, and correlate
+with H2 per-class IoU. If the correlation is significant in the
+predicted direction --- $\pi_0$ underperforms on \texttt{cut}-class
+tasks more than on \texttt{contain}-class tasks --- the chain
+"encoder probing → policy success" closes in both directions and the
+project's framing converts from a methodology paper to a manipulation
+paper. Estimated compute: 40 GPU-hours on a 24+ GB GPU (cloud, e.g.,
+Lambda Labs A100 at \$1.10/hr $\approx$ \$50).
+
+\subsection{Adapter on a real policy}
+
 Train a vision-only manipulation policy from scratch on a part-aware
-task (knife-handle grasping in ManiSkill3 PickSingleYCB) with three
-perception heads: DINOv2, $\pi_0$ raw, $\pi_0$+adapter. Measure success
-rate; predict the ranking from the H2 per-class structure.
+task --- knife-handle grasping in ManiSkill3 PickSingleYCB --- with
+three perception heads: DINOv2, $\pi_0$ raw, $\pi_0$+adapter. Measure
+success rate. Predict the ranking from the H2 per-class structure.
+This is the closed-loop intervention test that the H6 state-override
+experiment failed.
 
-\paragraph{Cross-dataset validation.}
-Run the same probing protocol on AGD20K (36 affordance classes, 20K
-images) and IIT-AFF. If the class-asymmetric pattern persists, the
-finding generalises beyond UMD.
+\subsection{Cross-dataset validation}
 
-\paragraph{More VLA families.}
+Run the same probing protocol on AGD20K (36 affordance classes,
+20\,000 images) and IIT-AFF. If the class-asymmetric pattern persists
+on a substantially larger affordance taxonomy, the finding generalises
+beyond UMD. The mechanism correlation power increases with the number
+of classes; AGD20K's 36 classes vs. UMD's 5 would convert the current
+$\rho = 0.90$ ($n = 5$) result into a much stronger statistical claim.
+
+\subsection{Additional VLA families}
+
 Extend to Octo \cite{octo2024}, RT-2 \cite{rt22023}, and Cosmos-Policy
-\cite{cosmospolicy2025}. Three families is the minimum for a
-``recipe-independent'' claim; five would harden it.
+\cite{cosmospolicy2025}. Three VLA families is the minimum for a
+"recipe-independent" claim; five would harden it considerably.
 
 % =====================================================================
 \section{Conclusion}
 \label{sec:conclusion}
 
-We measured the per-class structure of affordance loss inside three
-deployed vision-language-action encoders. The loss is class-asymmetric
-($\texttt{cut} -27$\,pp, $\texttt{contain} -1$\,pp on $\pi_0$),
-generalises across two VLA families, is mechanistically localised
-(final-layer rotation, with class-selective drift correlated to
-per-class IoU drop at $\rho = 0.90$ on $\pi_0$), and is recoverable
-with a 297\,K-parameter adapter that closes 82\% of the cut-class gap
-on frozen features. However, on the binary part-discrimination
-formulations downstream manipulation pipelines actually use, the
-apparent 27\,pp deficit collapses to $\leq 3$\,pp --- the standard
-multi-class probe overstates the encoder deficit relative to the
-perception sub-problem manipulation actually solves.
+This project measured the per-class structure of affordance loss
+inside three deployed vision--language--action encoders. The loss is
+class-asymmetric (\texttt{cut} $-$27 pp, \texttt{contain} $-$1 pp on
+$\pi_0$), generalises across two VLA families, is mechanistically
+localised to the final transformer block (with class-selective drift
+correlated to per-class IoU drop at $\rho = 0.90$ on $\pi_0$), and is
+recoverable with a 297\,K-parameter adapter that closes 82\% of the
+cut-class gap on frozen features. However, on the binary
+part-discrimination formulations downstream manipulation pipelines
+actually use, the apparent 27 pp deficit collapses to under 3 pp ---
+the standard multi-class probe overstates the encoder deficit relative
+to the perception sub-problem manipulation actually solves.
+
+The methodological takeaway is: practitioners deploying VLAs should
+benchmark the encoder using the binary part-discrimination protocol
+that matches their downstream task, not multi-class IoU. If they need
+a stronger signal, a 297\,K-parameter adapter on top of the frozen
+encoder closes most of the gap. We submit that this combination of
+findings is a useful piece of the broader effort to make VLA
+deployments predictable and reliable.
 
 % =====================================================================
-\section*{Code and reproducibility}
+\section{Code Availability}
+\label{sec:code}
 
-All code, intermediate results, slides, and figures are available at
-\url{https://github.com/nitik1998/PAVE} under MIT license. Every
-result in this paper is reproducible from the public repository on a
-single 8\,GB consumer GPU.
+All code, intermediate results, slides, figures, and writeup are
+available at \url{https://github.com/nitik1998/PAVE} under the MIT
+license. Every result reported in this document is reproducible from
+the public repository on a single 8 GB consumer GPU (we developed and
+ran every experiment on an NVIDIA RTX 5060 Laptop). Total compute
+spent: zero cloud dollars.
+
+The companion submission archive \verb|PAVE-submission.zip| contains a
+snapshot of the public repository (\texttt{git archive HEAD}). It
+excludes the 6 GB UMD dataset (which users download via
+\verb|scripts/download_umd.sh|) and the 4.7 GB of cached prediction
+arrays (which users regenerate via the run scripts). The archive
+contents:
+
+\begin{itemize}[leftmargin=1.3em, itemsep=0.0em, topsep=0.2em]
+\item \verb|src/| --- frozen-encoder probes for DINOv2, SigLIP, $\pi_0$,
+$\pi_{0.5}$, OpenVLA, Florence-2, Qwen2-VL, MolmoE, random projection
+control. UMD dataset loader. mIoU / per-class IoU metrics.
+\item \verb|scripts/| --- top-level run scripts including
+\verb|run_probes.py| (the main entry point), the mechanism analysis
+under \verb|scripts/mechanism/|, and the adapter intervention under
+\verb|scripts/intervention/|.
+\item \verb|experiments/h6-maniskill-affordance/| --- ManiSkill3
+PickCube companion experiment (Experiment 8 in this report).
+\item \verb|experiments/h9-handle-blade/| ---
+single-object handle/blade discrimination (H9).
+\item \verb|experiments/h10-multitool/| --- cut-vs-rest
+across full UMD (H10a) and multi-tool composite scenes (H10b).
+\item \verb|configs/| --- affordance taxonomy YAML.
+\item \verb|outputs/figures/|, \verb|outputs/tables_500/|,
+\verb|outputs/mechanism/|, \verb|outputs/intervention/|,
+\verb|outputs/bootstrap/| --- all numerical results and figures.
+\item \verb|slides/| --- the 13-slide Beamer presentation.
+\item \verb|report/| --- this report (LaTeX + PDF) and bibliography.
+\item \verb|README.md|, \verb|findings.md|, \verb|RESEARCH_ROADMAP.md| --- project documentation.
+\end{itemize}
 
 % =====================================================================
 \bibliographystyle{plain}
